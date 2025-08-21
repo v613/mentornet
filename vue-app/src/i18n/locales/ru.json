@@ -1,0 +1,29 @@
+{
+  "app": {
+    "title": "MentorNet",
+    "subtitle": "Ваше обучение начинается здесь",
+    "welcome": "Добро пожаловать в MentorNet, {email}!",
+    "dashboard": "Панель управления",
+    "dashboardWelcome": "Добро пожаловать на вашу обучающую панель!"
+  },
+  "auth": {
+    "signIn": "Войти",
+    "signUp": "Регистрация",
+    "signOut": "Выйти",
+    "processing": "Обработка...",
+    "username": "Имя пользователя",
+    "usernamePlaceholder": "Введите имя пользователя",
+    "email": "Email",
+    "emailPlaceholder": "Введите email",
+    "password": "Пароль",
+    "passwordPlaceholder": "Введите пароль",
+    "noAccount": "Нет аккаунта?",
+    "haveAccount": "Уже есть аккаунт?",
+    "loading": "Загрузка..."
+  },
+  "language": {
+    "ro": "Română",
+    "en": "English",
+    "ru": "Русский"
+  }
+}

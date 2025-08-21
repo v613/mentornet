@@ -1,0 +1,29 @@
+{
+  "app": {
+    "title": "MentorNet",
+    "subtitle": "Your Learning Journey Starts Here",
+    "welcome": "Welcome to MentorNet, {email}!",
+    "dashboard": "Dashboard",
+    "dashboardWelcome": "Welcome to your learning dashboard!"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "processing": "Processing...",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "loading": "Loading..."
+  },
+  "language": {
+    "ro": "Română",
+    "en": "English",
+    "ru": "Русский"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "app": {
+    "title": "MentorNet",
+    "subtitle": "Călătoria ta de învățare începe aici",
+    "welcome": "Bun venit la MentorNet, {email}!",
+    "dashboard": "Panou de control",
+    "dashboardWelcome": "Bun venit la panoul tău de învățare!"
+  },
+  "auth": {
+    "signIn": "Conectare",
+    "signUp": "Înregistrare",
+    "signOut": "Deconectare",
+    "processing": "Se procesează...",
+    "username": "Nume utilizator",
+    "usernamePlaceholder": "Introduceți numele de utilizator",
+    "email": "Email",
+    "emailPlaceholder": "Introduceți email-ul",
+    "password": "Parolă",
+    "passwordPlaceholder": "Introduceți parola",
+    "noAccount": "Nu aveți un cont?",
+    "haveAccount": "Aveți deja un cont?",
+    "loading": "Se încarcă..."
+  },
+  "language": {
+    "ro": "Română",
+    "en": "English",
+    "ru": "Русский"
+  }
+}
