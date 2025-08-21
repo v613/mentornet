@@ -1,4 +1,5 @@
 # MentorNet Platform
+[![Netlify Status](https://api.netlify.com/api/v1/badges/448ea9dc-ad24-4d1f-bbd9-d8f2cb9ce8bf/deploy-status)](https://app.netlify.com/projects/mentoras/deploys)
 
 **Connecting learners with mentors, forming a network for personalized guidance and training.**
 
