@@ -35,7 +35,7 @@ MentorNet is a comprehensive platform that enables users to find mentorship, sha
 
 ```bash
 git clone <repository-url>
-cd mentornet/vue-app
+cd mentornet
 ```
 
 ### 2. Install Dependencies
