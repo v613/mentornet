@@ -1,9 +1,9 @@
 <template>
   <div class="language-switcher">
     <select v-model="currentLocale" @change="changeLanguage" class="language-select">
-      <option value="ro">{{ $t('language.ro') }}</option>
-      <option value="en">{{ $t('language.en') }}</option>
-      <option value="ru">{{ $t('language.ru') }}</option>
+      <option value="ro">🇷🇴 {{ $t('language.ro') }}</option>
+      <option value="en">🇺🇸 {{ $t('language.en') }}</option>
+      <option value="ru">🇷🇺 {{ $t('language.ru') }}</option>
     </select>
   </div>
 </template>

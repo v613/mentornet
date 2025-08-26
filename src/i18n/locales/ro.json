@@ -21,6 +21,65 @@
     "haveAccount": "Aveți deja un cont?",
     "loading": "Se încarcă..."
   },
+  "courses": {
+    "title": "Cursuri",
+    "management": "Management Cursuri",
+    "createCourse": "Creează Curs",
+    "myCourses": "Cursurile mele",
+    "availableCourses": "Cursuri disponibile",
+    "allCourses": "Toate cursurile (Admin)",
+    "applicationSubmitted": "Aplicația a fost trimisă cu succes!",
+    "errorApplying": "Eroare la aplicarea pentru curs",
+    "errorUpdating": "Eroare la actualizarea cursului",
+    "loading": "Se încarcă cursurile...",
+    "noCoursesFound": "Nu s-au găsit cursuri"
+  },
+  "profile": {
+    "title": "Profil",
+    "myProfile": "Profilul meu",
+    "manageAccount": "Gestionează informațiile contului și preferințele",
+    "basicInfo": "Informații de bază",
+    "profileDetails": "Detalii profil",
+    "email": "Adresa de email",
+    "displayName": "Nume afișat",
+    "role": "Rol",
+    "department": "Departament",
+    "location": "Locație",
+    "experience": "Ani de experiență",
+    "skills": "Competențe și interese",
+    "skillsPlaceholder": "ex. JavaScript, React, Management proiecte, Leadership",
+    "learningGoals": "Obiective de învățare",
+    "learningGoalsPlaceholder": "ex. Machine Learning, Vorbirea în public, Avansarea în carieră",
+    "mentorSettings": "Setări mentor",
+    "mentoringCapacity": "Capacitate mentorat",
+    "expertise": "Domenii de expertiză",
+    "canCreateCourses": "Poate crea cursuri",
+    "availability": "Disponibilitate",
+    "availableForMentoring": "Disponibil pentru activități de mentorat",
+    "saveProfile": "Salvează profilul",
+    "resetChanges": "Resetează modificările",
+    "saving": "Se salvează...",
+    "profileSaved": "Profil salvat cu succes!",
+    "loadingProfile": "Se încarcă profilul..."
+  },
+  "permitio": {
+    "title": "Permit.io",
+    "integration": "Integrare Permit.io",
+    "manageSync": "Gestionează sincronizarea utilizatorilor între Firebase și Permit.io"
+  },
+  "dashboard": {
+    "welcome": "Bun venit, {email}!",
+    "userRole": {
+      "mentee": "Mentee",
+      "mentor": "Mentor", 
+      "admin": "Administrator"
+    }
+  },
+  "common": {
+    "cancel": "Anulează",
+    "signOut": "Deconectare",
+    "loading": "Se încarcă..."
+  },
   "language": {
     "ro": "Română",
     "en": "English",

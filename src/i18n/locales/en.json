@@ -21,6 +21,65 @@
     "haveAccount": "Already have an account?",
     "loading": "Loading..."
   },
+  "courses": {
+    "title": "Courses",
+    "management": "Course Management",
+    "createCourse": "Create Course",
+    "myCourses": "My Courses",
+    "availableCourses": "Available Courses",
+    "allCourses": "All Courses (Admin)",
+    "applicationSubmitted": "Application submitted successfully!",
+    "errorApplying": "Error applying to course",
+    "errorUpdating": "Error updating course",
+    "loading": "Loading courses...",
+    "noCoursesFound": "No courses found"
+  },
+  "profile": {
+    "title": "Profile",
+    "myProfile": "My Profile",
+    "manageAccount": "Manage your account information and preferences",
+    "basicInfo": "Basic Information",
+    "profileDetails": "Profile Details",
+    "email": "Email Address",
+    "displayName": "Display Name",
+    "role": "Role",
+    "department": "Department",
+    "location": "Location",
+    "experience": "Years of Experience",
+    "skills": "Skills & Interests",
+    "skillsPlaceholder": "e.g. JavaScript, React, Project Management, Leadership",
+    "learningGoals": "Learning Goals",
+    "learningGoalsPlaceholder": "e.g. Machine Learning, Public Speaking, Career Advancement",
+    "mentorSettings": "Mentor Settings",
+    "mentoringCapacity": "Mentoring Capacity",
+    "expertise": "Areas of Expertise",
+    "canCreateCourses": "Can create courses",
+    "availability": "Availability",
+    "availableForMentoring": "Available for mentoring activities",
+    "saveProfile": "Save Profile",
+    "resetChanges": "Reset Changes",
+    "saving": "Saving...",
+    "profileSaved": "Profile saved successfully!",
+    "loadingProfile": "Loading profile..."
+  },
+  "permitio": {
+    "title": "Permit.io",
+    "integration": "Permit.io Integration",
+    "manageSync": "Manage user synchronization between Firebase and Permit.io"
+  },
+  "dashboard": {
+    "welcome": "Welcome, {email}!",
+    "userRole": {
+      "mentee": "Mentee",
+      "mentor": "Mentor", 
+      "admin": "Administrator"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "signOut": "Sign Out",
+    "loading": "Loading..."
+  },
   "language": {
     "ro": "Română",
     "en": "English",

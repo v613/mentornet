@@ -21,6 +21,65 @@
     "haveAccount": "Уже есть аккаунт?",
     "loading": "Загрузка..."
   },
+  "courses": {
+    "title": "Курсы",
+    "management": "Управление курсами",
+    "createCourse": "Создать курс",
+    "myCourses": "Мои курсы",
+    "availableCourses": "Доступные курсы",
+    "allCourses": "Все курсы (Администратор)",
+    "applicationSubmitted": "Заявка успешно подана!",
+    "errorApplying": "Ошибка при подаче заявки на курс",
+    "errorUpdating": "Ошибка при обновлении курса",
+    "loading": "Загрузка курсов...",
+    "noCoursesFound": "Курсы не найдены"
+  },
+  "profile": {
+    "title": "Профиль",
+    "myProfile": "Мой профиль",
+    "manageAccount": "Управление информацией об аккаунте и настройками",
+    "basicInfo": "Основная информация",
+    "profileDetails": "Детали профиля",
+    "email": "Email адрес",
+    "displayName": "Отображаемое имя",
+    "role": "Роль",
+    "department": "Отдел",
+    "location": "Местоположение",
+    "experience": "Лет опыта",
+    "skills": "Навыки и интересы",
+    "skillsPlaceholder": "например: JavaScript, React, управление проектами, лидерство",
+    "learningGoals": "Цели обучения",
+    "learningGoalsPlaceholder": "например: машинное обучение, публичные выступления, карьерный рост",
+    "mentorSettings": "Настройки ментора",
+    "mentoringCapacity": "Возможности менторства",
+    "expertise": "Области экспертизы",
+    "canCreateCourses": "Может создавать курсы",
+    "availability": "Доступность",
+    "availableForMentoring": "Доступен для менторской деятельности",
+    "saveProfile": "Сохранить профиль",
+    "resetChanges": "Сбросить изменения",
+    "saving": "Сохранение...",
+    "profileSaved": "Профиль успешно сохранён!",
+    "loadingProfile": "Загрузка профиля..."
+  },
+  "permitio": {
+    "title": "Permit.io",
+    "integration": "Интеграция Permit.io",
+    "manageSync": "Управление синхронизацией пользователей между Firebase и Permit.io"
+  },
+  "dashboard": {
+    "welcome": "Добро пожаловать, {email}!",
+    "userRole": {
+      "mentee": "Подопечный",
+      "mentor": "Ментор",
+      "admin": "Администратор"
+    }
+  },
+  "common": {
+    "cancel": "Отмена",
+    "signOut": "Выйти",
+    "loading": "Загрузка..."
+  },
   "language": {
     "ro": "Română",
     "en": "English",
