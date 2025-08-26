@@ -1,9 +1,11 @@
 import { auth } from '../firebase.js'
 import { databaseService } from './database.js'
+import { getEnvConfig } from '../config/env.js'
 
 class PermitService {
   constructor() {
-    this.apiKey = __VITE_PERMIT_API_KEY__
+    const config = getEnvConfig()
+    this.apiKey = config.PERMIT_API_KEY
     this.baseUrl = 'https://api.permit.io'
     this.pdpUrl = 'https://cloudpdp.api.permit.io'
     this.enabled = !!this.apiKey
