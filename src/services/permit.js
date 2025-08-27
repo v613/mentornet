@@ -3,7 +3,7 @@ import { databaseService } from './database.js'
 
 class PermitService {
   constructor() {
-    this.apiKey = __VITE_PERMIT_API_KEY__
+    this.apiKey = import.meta.env.VITE_PERMIT_API_KEY
     this.baseUrl = 'https://api.permit.io'
     this.pdpUrl = 'https://cloudpdp.api.permit.io'
     this.enabled = !!this.apiKey
