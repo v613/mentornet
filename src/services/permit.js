@@ -3,13 +3,13 @@ import { databaseService } from './database.js'
 
 class PermitService {
   constructor() {
-    this.apiKey = import.meta.env.VITE_PERMIT_API_KEY
+    this.apiKey = process.env.PERMIT_API_KEY
     this.baseUrl = 'https://api.permit.io'
     this.pdpUrl = 'https://cloudpdp.api.permit.io'
     this.enabled = !!this.apiKey
     
     if (!this.enabled) {
-      console.warn('Permit.io integration disabled: VITE_PERMIT_API_KEY not configured')
+      console.warn('Permit.io integration disabled: PERMIT_API_KEY not configured')
     }
   }
 
