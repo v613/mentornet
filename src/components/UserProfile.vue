@@ -40,129 +40,33 @@
             </div>
 
             <div class="form-group">
-              <label for="role">{{ $t('profile.role') }}</label>
-              <select 
-                id="role"
-                v-model="profile.role" 
-                class="form-select"
-                :disabled="!canChangeRole"
-              >
-                <option value="mentee">Mentee</option>
-                <option value="mentor">Mentor</option>
-                <option value="admin" v-if="canChangeRole">Admin</option>
-              </select>
-              <small class="form-help" v-if="!canChangeRole">
-                {{ $t('profile.help.roleRequiresAdmin') }}
-              </small>
+              <label for="profileImage">{{ $t('profile.profileImage') }}</label>
+              <input 
+                id="profileImage"
+                type="url" 
+                v-model="profile.profileImage"
+                class="form-input"
+                :placeholder="$t('profile.profileImagePlaceholder')"
+              />
+              <small class="form-help">{{ $t('profile.help.profileImageHelp') }}</small>
             </div>
+
           </div>
         </div>
 
         <!-- Profile Details -->
         <div class="form-section">
           <h3>{{ $t('profile.profileDetails') }}</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="department">{{ $t('profile.department') }}</label>
-              <input 
-                id="department"
-                type="text" 
-                v-model="profile.attributes.department"
-                class="form-input"
-                placeholder="e.g. Engineering, Marketing"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="location">{{ $t('profile.location') }}</label>
-              <input 
-                id="location"
-                type="text" 
-                v-model="profile.attributes.location"
-                class="form-input"
-                placeholder="e.g. San Francisco, Remote"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="experience">{{ $t('profile.experience') }}</label>
-              <input 
-                id="experience"
-                type="number" 
-                v-model.number="profile.attributes.experience"
-                class="form-input"
-                min="0"
-                max="50"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Skills -->
-        <div class="form-section">
-          <h3>{{ $t('profile.skills') }}</h3>
           <div class="form-group">
-            <label for="skills">{{ $t('profile.skills') }} (comma-separated)</label>
+            <label for="description">{{ $t('profile.description') }}</label>
             <textarea 
-              id="skills"
-              v-model="skillsText"
+              id="description"
+              v-model="profile.description"
               class="form-textarea"
-              :placeholder="$t('profile.skillsPlaceholder')"
-              rows="3"
+              :placeholder="$t('profile.descriptionPlaceholder')"
+              rows="4"
             ></textarea>
-            <small class="form-help">{{ $t('profile.help.skillsRelevant') }}</small>
-          </div>
-
-          <div class="form-group">
-            <label for="learningGoals">{{ $t('profile.learningGoals') }} (comma-separated)</label>
-            <textarea 
-              id="learningGoals"
-              v-model="learningGoalsText"
-              class="form-textarea"
-              :placeholder="$t('profile.learningGoalsPlaceholder')"
-              rows="3"
-            ></textarea>
-            <small class="form-help">{{ $t('profile.help.learningGoalsDescription') }}</small>
-          </div>
-        </div>
-
-        <!-- Mentor-specific fields -->
-        <div v-if="profile.role === 'mentor'" class="form-section">
-          <h3>{{ $t('profile.mentorSettings') }}</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="mentoringCapacity">{{ $t('profile.mentoringCapacity') }}</label>
-              <input 
-                id="mentoringCapacity"
-                type="number" 
-                v-model.number="profile.attributes.mentoringCapacity"
-                class="form-input"
-                min="1"
-                max="20"
-              />
-              <small class="form-help">{{ $t('profile.help.mentoringCapacityDescription') }}</small>
-            </div>
-
-            <div class="form-group">
-              <label for="expertise">{{ $t('profile.expertise') }} (comma-separated)</label>
-              <textarea 
-                id="expertise"
-                v-model="expertiseText"
-                class="form-textarea"
-                placeholder="e.g. Software Engineering, Product Management, Startups"
-                rows="3"
-              ></textarea>
-            </div>
-
-            <div class="form-group checkbox-group">
-              <label class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  v-model="profile.attributes.canCreateCourses"
-                />
-                <span>{{ $t('profile.canCreateCourses') }}</span>
-              </label>
-            </div>
+            <small class="form-help">{{ $t('profile.help.descriptionHelp') }}</small>
           </div>
         </div>
 
@@ -178,6 +82,49 @@
               <span>{{ $t('profile.availableForMentoring') }}</span>
             </label>
             <small class="form-help">{{ $t('profile.help.availabilityDescription') }}</small>
+          </div>
+        </div>
+
+        <!-- Password & Security -->
+        <div class="form-section">
+          <h3>{{ $t('profile.passwordSecurity') }}</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="currentPassword">{{ $t('profile.currentPassword') }}</label>
+              <input 
+                id="currentPassword"
+                type="password" 
+                v-model="passwordData.currentPassword"
+                class="form-input"
+                autocomplete="current-password"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="newPassword">{{ $t('profile.newPassword') }}</label>
+              <input 
+                id="newPassword"
+                type="password" 
+                v-model="passwordData.newPassword"
+                class="form-input"
+                autocomplete="new-password"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">{{ $t('profile.confirmPassword') }}</label>
+              <input 
+                id="confirmPassword"
+                type="password" 
+                v-model="passwordData.confirmPassword"
+                class="form-input"
+                autocomplete="new-password"
+              />
+            </div>
+          </div>
+          <small class="form-help">{{ $t('profile.help.passwordHelp') }}</small>
+          <div v-if="passwordError" class="error-message">
+            {{ passwordError }}
           </div>
         </div>
       </div>
@@ -203,7 +150,6 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { authService } from '../services/auth.js'
 import { databaseService } from '../services/database.js'
 
 const { t } = useI18n()
@@ -215,6 +161,8 @@ const originalProfile = ref(null)
 const profile = ref({
   email: '',
   displayName: '',
+  profileImage: '',
+  description: '',
   role: 'mentee',
   attributes: {
     department: '',
@@ -228,6 +176,14 @@ const profile = ref({
     availableForMentoring: true
   }
 })
+
+// Password change data
+const passwordData = ref({
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+})
+const passwordError = ref('')
 
 // Text representations for array fields
 const skillsText = ref('')
@@ -267,51 +223,34 @@ onMounted(async () => {
 const loadProfile = async () => {
   loading.value = true
   try {
-    const currentUser = authService.getCurrentUser()
-    if (!currentUser) {
-      throw new Error('No authenticated user')
+    const currentUserId = databaseService.getCurrentUserId()
+    if (!currentUserId) {
+      throw new Error('No current user')
     }
 
-    const userProfile = await authService.getCurrentUserProfile()
-    
-    if (userProfile) {
+    const userData = await databaseService.getUserWithRoles(currentUserId)
+    if (userData) {
       profile.value = {
-        uid: currentUser.uid,
-        email: currentUser.email,
-        displayName: currentUser.displayName || currentUser.email.split('@')[0],
-        role: userProfile.role || 'mentee',
+        email: userData.email,
+        userid: userData.userid,
+        displayName: userData.displayName || userData.userid,
+        profileImage: userData.img || '',
+        description: userData.description || '',
+        role: userData.role,
         attributes: {
-          department: userProfile.attributes?.department || '',
-          location: userProfile.attributes?.location || '',
-          experience: userProfile.attributes?.experience || 0,
-          skills: userProfile.attributes?.skills || [],
-          learningGoals: userProfile.attributes?.learningGoals || [],
-          expertise: userProfile.attributes?.expertise || [],
-          mentoringCapacity: userProfile.attributes?.mentoringCapacity || 5,
-          canCreateCourses: userProfile.attributes?.canCreateCourses || false,
-          availableForMentoring: userProfile.attributes?.availableForMentoring !== false,
-          ...userProfile.attributes
+          department: userData.department || '',
+          location: userData.location || '',
+          experience: userData.experience || 0,
+          skills: userData.skills || [],
+          learningGoals: userData.learningGoals || [],
+          expertise: userData.expertise || [],
+          mentoringCapacity: userData.mentoringCapacity || 5,
+          canCreateCourses: userData.role === 'mentor' || userData.role === 'admin',
+          availableForMentoring: userData.availableForMentoring !== false
         }
       }
     } else {
-      // New user profile
-      profile.value = {
-        uid: currentUser.uid,
-        email: currentUser.email,
-        displayName: currentUser.displayName || currentUser.email.split('@')[0],
-        role: 'mentee',
-        attributes: {
-          department: '',
-          location: '',
-          experience: 0,
-          skills: [],
-          learningGoals: [],
-          expertise: [],
-          mentoringCapacity: 5,
-          canCreateCourses: false,
-          availableForMentoring: true
-        }
-      }
+      throw new Error('User data not found')
     }
 
     // Update text fields
@@ -325,7 +264,7 @@ const loadProfile = async () => {
     console.error('Error loading profile:', error)
     saveResult.value = {
       type: 'error',
-      message: `Failed to load profile: ${error.message}`
+      message: t('profile.errorLoading', { error: error.message })
     }
   } finally {
     loading.value = false
@@ -337,58 +276,81 @@ const saveProfile = async () => {
   saveResult.value = null
   
   try {
-    // Update Firebase Auth display name if changed
-    const currentUser = authService.getCurrentUser()
-    if (currentUser && currentUser.displayName !== profile.value.displayName) {
-      const { updateProfile } = await import('firebase/auth')
-      await updateProfile(currentUser, {
-        displayName: profile.value.displayName
-      })
+    const currentUserId = databaseService.getCurrentUserId()
+    if (!currentUserId) {
+      throw new Error('No current user')
     }
 
-    // Prepare profile data for Firestore
-    const profileData = {
+    // Validate password if any password field is filled
+    if (!validatePassword()) {
+      saving.value = false
+      return
+    }
+
+    // Update profile data
+    const updateData = {
       displayName: profile.value.displayName,
-      role: profile.value.role,
-      attributes: { ...profile.value.attributes }
+      profileImage: profile.value.profileImage,
+      description: profile.value.description,
+      availableForMentoring: profile.value.attributes.availableForMentoring
     }
 
-    // Check if profile exists
-    const existingProfile = await databaseService.getUserProfile(profile.value.uid)
+    const result = await databaseService.updateUserProfile(currentUserId, updateData)
     
-    let result
-    if (existingProfile.success) {
-      // Update existing profile
-      result = await databaseService.updateUserProfile(profileData)
-    } else {
-      // Create new profile
-      result = await databaseService.createUserProfile({
-        ...profileData,
-        email: profile.value.email
-      })
+    if (!result.success) {
+      throw new Error(result.error)
     }
 
-    if (result.success) {
+    // Change password if provided
+    if (passwordData.value.currentPassword && passwordData.value.newPassword) {
+      const passwordResult = await databaseService.changePassword(
+        currentUserId,
+        passwordData.value.currentPassword,
+        passwordData.value.newPassword
+      )
+      
+      if (!passwordResult.success) {
+        throw new Error(passwordResult.error)
+      }
+      
+      // Clear password fields after successful change
+      passwordData.value = {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }
+      passwordError.value = ''
+      
+      saveResult.value = {
+        type: 'success',
+        message: t('profile.profileSaved') + ' ' + t('profile.passwordChanged')
+      }
+    } else {
       saveResult.value = {
         type: 'success',
         message: t('profile.profileSaved')
       }
-      
-      // Update original profile for reset functionality
-      originalProfile.value = JSON.parse(JSON.stringify(profile.value))
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        saveResult.value = null
-      }, 3000)
-    } else {
-      throw new Error(result.error)
     }
+    
+    // Update original profile for reset functionality
+    originalProfile.value = JSON.parse(JSON.stringify(profile.value))
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      saveResult.value = null
+    }, 3000)
   } catch (error) {
     console.error('Error saving profile:', error)
-    saveResult.value = {
-      type: 'error',
-      message: `Failed to save profile: ${error.message}`
+    if (error.message.includes('password')) {
+      saveResult.value = {
+        type: 'error',
+        message: t('profile.errorChangingPassword', { error: error.message })
+      }
+    } else {
+      saveResult.value = {
+        type: 'error',
+        message: t('profile.errorSaving', { error: error.message })
+      }
     }
   } finally {
     saving.value = false
@@ -404,8 +366,39 @@ const resetProfile = () => {
     learningGoalsText.value = profile.value.attributes.learningGoals.join(', ')
     expertiseText.value = profile.value.attributes.expertise.join(', ')
     
+    // Reset password fields
+    passwordData.value = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    }
+    passwordError.value = ''
+    
     saveResult.value = null
   }
+}
+
+const validatePassword = () => {
+  passwordError.value = ''
+  
+  if (passwordData.value.newPassword || passwordData.value.confirmPassword || passwordData.value.currentPassword) {
+    if (!passwordData.value.currentPassword) {
+      passwordError.value = t('profile.help.passwordHelp')
+      return false
+    }
+    
+    if (passwordData.value.newPassword.length < 6) {
+      passwordError.value = t('profile.help.passwordTooShort')
+      return false
+    }
+    
+    if (passwordData.value.newPassword !== passwordData.value.confirmPassword) {
+      passwordError.value = t('profile.help.passwordMismatch')
+      return false
+    }
+  }
+  
+  return true
 }
 </script>
 
@@ -607,6 +600,16 @@ const resetProfile = () => {
   background-color: var(--color-error-light);
   color: var(--color-error-dark);
   border: 1px solid var(--color-error);
+}
+
+.error-message {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: var(--color-error-light);
+  color: var(--color-error-dark);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
 }
 
 @media (max-width: 768px) {

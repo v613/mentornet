@@ -23,21 +23,21 @@
         </div>
         
         <div class="course-info">
-          <p class="description">{{ course.description || 'No description available' }}</p>
+          <p class="description">{{ course.description || t('courses.noDescription') }}</p>
           
           <div class="course-meta">
             <div class="meta-item">
-              <span class="label">Creator:</span>
+              <span class="label">{{ t('courses.creator') }}:</span>
               <span class="value">{{ course.creatorName }}</span>
             </div>
             
             <div class="meta-item">
-              <span class="label">Enrolled:</span>
+              <span class="label">{{ t('courses.enrolled') }}:</span>
               <span class="value">{{ course.enrolledCount || 0 }} / {{ course.maxEnrollment || 20 }}</span>
             </div>
             
             <div v-if="course.skills && course.skills.length > 0" class="meta-item">
-              <span class="label">Skills:</span>
+              <span class="label">{{ t('courses.skills') }}:</span>
               <div class="skills-tags">
                 <span 
                   v-for="skill in course.skills.slice(0, 3)" 
@@ -53,7 +53,7 @@
             </div>
             
             <div class="meta-item">
-              <span class="label">Created:</span>
+              <span class="label">{{ t('courses.created') }}:</span>
               <span class="value">{{ formatDate(course.createdAt) }}</span>
             </div>
           </div>
@@ -67,7 +67,7 @@
               v-if="course.status === 'draft'"
               class="action-btn publish"
             >
-              Publish
+              {{ t('courses.actions.publish') }}
             </button>
             
             <button 
@@ -75,21 +75,21 @@
               v-if="course.status === 'published'"
               class="action-btn archive"
             >
-              Archive
+              {{ t('courses.actions.archive') }}
             </button>
             
             <button 
               @click.stop="editCourse(course)"
               class="action-btn edit"
             >
-              Edit
+              {{ t('courses.actions.edit') }}
             </button>
             
             <button 
               @click.stop="viewApplications(course)"
               class="action-btn applications"
             >
-              Applications ({{ course.applicationsCount || 0 }})
+              {{ t('courses.actions.applications') }} ({{ course.applicationsCount || 0 }})
             </button>
           </template>
           
@@ -100,14 +100,14 @@
               :disabled="course.enrolledCount >= course.maxEnrollment"
               class="action-btn apply"
             >
-              {{ course.enrolledCount >= course.maxEnrollment ? 'Full' : 'Apply' }}
+              {{ course.enrolledCount >= course.maxEnrollment ? t('courses.actions.full') : t('courses.actions.apply') }}
             </button>
             
             <button 
               @click.stop="viewDetails(course)"
               class="action-btn details"
             >
-              View Details
+              {{ t('courses.actions.viewDetails') }}
             </button>
           </template>
           
@@ -118,14 +118,14 @@
               v-if="course.status === 'published'"
               class="action-btn moderate"
             >
-              Moderate
+              {{ t('courses.actions.moderate') }}
             </button>
             
             <button 
               @click.stop="viewDetails(course)"
               class="action-btn details"
             >
-              Details
+              {{ t('courses.actions.details') }}
             </button>
           </template>
         </div>
@@ -136,6 +136,9 @@
 
 <script setup>
 import { defineEmits } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   courses: {
@@ -157,46 +160,46 @@ const emit = defineEmits(['select-course', 'update-course', 'apply-to-course'])
 const getEmptyMessage = () => {
   switch (props.currentTab) {
     case 'my-courses':
-      return 'You haven\'t created any courses yet. Click "Create Course" to get started!'
+      return t('courses.empty.myCourses')
     case 'available':
-      return 'No published courses available at the moment.'
+      return t('courses.empty.available')
     case 'all-courses':
-      return 'No courses found in the system.'
+      return t('courses.empty.allCourses')
     default:
-      return 'No courses found.'
+      return t('courses.empty.default')
   }
 }
 
 const getStatusText = (status) => {
-  const statusTexts = {
-    draft: 'Draft',
-    published: 'Published',
-    archived: 'Archived',
-    suspended: 'Suspended'
+  const statusKeys = {
+    draft: 'courses.status.draft',
+    published: 'courses.status.published',
+    archived: 'courses.status.archived',
+    suspended: 'courses.status.suspended'
   }
-  return statusTexts[status] || status
+  return statusKeys[status] ? t(statusKeys[status]) : status
 }
 
 const formatDate = (timestamp) => {
-  if (!timestamp) return 'Unknown'
+  if (!timestamp) return t('common.unknown')
   
   try {
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
     return date.toLocaleDateString()
   } catch (error) {
-    return 'Invalid date'
+    return t('common.invalidDate')
   }
 }
 
 // Course action handlers
 const publishCourse = (course) => {
-  if (confirm('Are you sure you want to publish this course?')) {
+  if (confirm(t('courses.confirmPublish'))) {
     emit('update-course', course.id, { status: 'published' })
   }
 }
 
 const archiveCourse = (course) => {
-  if (confirm('Are you sure you want to archive this course?')) {
+  if (confirm(t('courses.confirmArchive'))) {
     emit('update-course', course.id, { status: 'archived' })
   }
 }
@@ -220,7 +223,7 @@ const viewDetails = (course) => {
 
 const moderateCourse = (course) => {
   // Admin moderation actions
-  const action = confirm('Suspend this course?') ? 'suspended' : null
+  const action = confirm(t('courses.confirmSuspend')) ? 'suspended' : null
   if (action) {
     emit('update-course', course.id, { status: action })
   }

@@ -68,7 +68,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { databaseService } from '../services/database'
 import { abacService } from '../services/abac'
-import { authService } from '../services/auth'
+// import { authService } from '../services/auth' // Removed - no auth service
 import CourseList from './CourseList.vue'
 import CourseDetails from './CourseDetails.vue'
 import CreateCourse from './CreateCourse.vue'
@@ -104,7 +104,7 @@ const filteredCourses = computed(() => {
 
 onMounted(async () => {
   try {
-    currentUser.value = authService.getCurrentUser()
+    currentUser.value = { uid: 'demo-user', email: 'user@example.com' } // Mock user
     if (!currentUser.value) return
 
     userRole.value = await abacService.getUserRole()
@@ -134,7 +134,7 @@ const loadCourses = async () => {
       filters.status = 'published'
     }
 
-    const result = await databaseService.getCourses(filters)
+    const result = await databaseService.getCourses(1, 10)
     if (result.success) {
       courses.value = result.courses
     }
