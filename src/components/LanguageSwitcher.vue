@@ -28,28 +28,30 @@ watch(locale, (newLocale) => {
 <style scoped>
 .language-switcher {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
 }
 
 .language-select {
-  padding: 0.5rem;
+  padding: var(--spacing-sm);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background-color: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: var(--color-text-inverse);
   font-size: 0.9rem;
   cursor: pointer;
   backdrop-filter: blur(10px);
+  transition: all var(--transition-base);
 }
 
 .language-select:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .language-select option {
-  background-color: #333;
-  color: white;
+  background-color: var(--color-gray-800);
+  color: var(--color-text-inverse);
 }
 </style>

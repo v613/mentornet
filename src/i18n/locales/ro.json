@@ -19,7 +19,21 @@
     "passwordPlaceholder": "Introduceți parola",
     "noAccount": "Nu aveți un cont?",
     "haveAccount": "Aveți deja un cont?",
-    "loading": "Se încarcă..."
+    "loading": "Se încarcă...",
+    "errors": {
+      "invalidInput": "Parametrii de intrare invalizi",
+      "invalidCredentials": "Date de autentificare invalide",
+      "authenticationFailed": "Autentificare eșuată",
+      "allFieldsRequired": "Toate câmpurile sunt obligatorii",
+      "inputTooLong": "Textul depășește lungimea maximă",
+      "invalidEmail": "Format email invalid",
+      "userExists": "Utilizatorul există deja",
+      "emailExists": "Email-ul există deja",
+      "userBlocked": "Contul utilizatorului este blocat",
+      "registrationFailed": "Înregistrare eșuată",
+      "userNotFound": "Utilizator negăsit",
+      "accessDenied": "Acces interzis"
+    }
   },
   "courses": {
     "title": "Cursuri",
@@ -32,7 +46,43 @@
     "errorApplying": "Eroare la aplicarea pentru curs",
     "errorUpdating": "Eroare la actualizarea cursului",
     "loading": "Se încarcă cursurile...",
-    "noCoursesFound": "Nu s-au găsit cursuri"
+    "noCoursesFound": "Nu s-au găsit cursuri",
+    "creator": "Creator",
+    "enrolled": "Înscriși",
+    "skills": "Competențe",
+    "created": "Creat",
+    "noDescription": "Nicio descriere disponibilă",
+    "confirmPublish": "Sigur doriți să publicați acest curs?",
+    "confirmArchive": "Sigur doriți să arhivați acest curs?",
+    "confirmSuspend": "Suspendați acest curs?",
+    "status": {
+      "draft": "Ciornă",
+      "published": "Publicat",
+      "archived": "Arhivat",
+      "suspended": "Suspendat"
+    },
+    "actions": {
+      "publish": "Publică",
+      "archive": "Arhivează", 
+      "edit": "Editează",
+      "applications": "Aplicații",
+      "apply": "Aplică",
+      "full": "Complet",
+      "viewDetails": "Vezi detalii",
+      "moderate": "Moderează",
+      "details": "Detalii"
+    },
+    "empty": {
+      "myCourses": "Nu ați creat încă niciun curs. Faceți clic pe \"Creează Curs\" pentru a începe!",
+      "available": "Nu sunt cursuri publicate disponibile în acest moment.",
+      "allCourses": "Nu s-au găsit cursuri în sistem.",
+      "default": "Nu s-au găsit cursuri."
+    }
+  },
+  "mentors": {
+    "title": "Mentori",
+    "noMentors": "Niciun mentor disponibil în acest moment",
+    "total": "mentori"
   },
   "profile": {
     "title": "Profil",
@@ -56,16 +106,37 @@
     "canCreateCourses": "Poate crea cursuri",
     "availability": "Disponibilitate",
     "availableForMentoring": "Disponibil pentru activități de mentorat",
+    "description": "Descriere",
+    "descriptionPlaceholder": "Spune-ne despre tine, experiența ta și obiectivele...",
+    "profileImage": "Imagine profil",
+    "profileImagePlaceholder": "https://example.com/imaginea-ta-de-profil.jpg",
+    "currentPassword": "Parola curentă",
+    "newPassword": "Parola nouă",
+    "confirmPassword": "Confirmă parola nouă",
+    "changePassword": "Schimbă parola",
+    "passwordSecurity": "Parolă și securitate",
     "saveProfile": "Salvează profilul",
     "resetChanges": "Resetează modificările",
     "saving": "Se salvează...",
     "profileSaved": "Profil salvat cu succes!",
-    "loadingProfile": "Se încarcă profilul..."
-  },
-  "permitio": {
-    "title": "Permit.io",
-    "integration": "Integrare Permit.io",
-    "manageSync": "Gestionează sincronizarea utilizatorilor între Firebase și Permit.io"
+    "passwordChanged": "Parola a fost schimbată cu succes!",
+    "loadingProfile": "Se încarcă profilul...",
+    "errorLoading": "Eșec la încărcarea profilului: {error}",
+    "errorSaving": "Eșec la salvarea profilului: {error}",
+    "errorChangingPassword": "Eșec la schimbarea parolei: {error}",
+    "help": {
+      "emailCannotChange": "Email-ul nu poate fi modificat",
+      "roleRequiresAdmin": "Modificarea rolului necesită aprobarea administratorului",
+      "skillsRelevant": "Adaugă competențe relevante pentru mentorat sau învățare",
+      "learningGoalsDescription": "Ce ai dori să înveți sau să îmbunătățești?",
+      "mentoringCapacityDescription": "Numărul maxim de mentee pe care îi poți gestiona",
+      "availabilityDescription": "Debifează dacă nu ești disponibil temporar",
+      "descriptionHelp": "Împărtășește-ți background-ul, interesele și ce cauți",
+      "profileImageHelp": "URL către imaginea ta de profil (opțional)",
+      "passwordHelp": "Lasă gol pentru a păstra parola curentă",
+      "passwordMismatch": "Parolele noi nu se potrivesc",
+      "passwordTooShort": "Parola trebuie să aibă cel puțin 6 caractere"
+    }
   },
   "dashboard": {
     "welcome": "Bun venit, {email}!",
@@ -78,7 +149,13 @@
   "common": {
     "cancel": "Anulează",
     "signOut": "Deconectare",
-    "loading": "Se încarcă..."
+    "loading": "Se încarcă...",
+    "unknown": "Necunoscut",
+    "invalidDate": "Dată invalidă",
+    "previous": "Anterior",
+    "next": "Următor",
+    "page": "Pagina",
+    "of": "din"
   },
   "language": {
     "ro": "Română",

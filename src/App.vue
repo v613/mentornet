@@ -3,94 +3,78 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import AuthForm from './components/AuthForm.vue'
 import CourseManagement from './components/CourseManagement.vue'
 import UserProfile from './components/UserProfile.vue'
-import PermitSync from './components/PermitSync.vue'
-import { authService } from './services/auth'
-import { abacService } from './services/abac'
+import MentorsList from './components/MentorsList.vue'
 
 const user = ref(null)
 const userProfile = ref(null)
 const loading = ref(true)
 const activeView = ref('courses')
 const isAdminUser = ref(false)
-let authStateUnsubscribe = null
 let inactivityTimer = null
+let activityCheckInterval = null
 let lastActivityTime = ref(Date.now())
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000 // 30 minutes in milliseconds
+const ACTIVITY_CHECK_INTERVAL = 60 * 1000 // Check every 1 minute
 
 onMounted(() => {
-  authStateUnsubscribe = authService.onAuthStateChanged(async (firebaseUser) => {
-    if (firebaseUser) {
-      try {
-        // Get full user profile with role and attributes
-        const profile = await authService.getCurrentUserProfile()
-        
-        user.value = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName || firebaseUser.email.split('@')[0]
-        }
-        
-        userProfile.value = profile
-        isAdminUser.value = profile?.role === 'admin'
-        
-        startInactivityTimer()
-        setupActivityListeners()
-      } catch (error) {
-        console.error('Error loading user profile:', error)
-        user.value = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName || firebaseUser.email.split('@')[0]
-        }
-      }
-    } else {
-      user.value = null
-      userProfile.value = null
-      isAdminUser.value = false
-      clearInactivityTimer()
-      removeActivityListeners()
-    }
-    loading.value = false
-  })
+  // Check if user should still be logged in
+  checkExistingSession()
+  loading.value = false
 })
 
 onUnmounted(() => {
-  if (authStateUnsubscribe) {
-    authStateUnsubscribe()
-  }
   clearInactivityTimer()
   removeActivityListeners()
 })
 
 const handleAuthSuccess = (authenticatedUser) => {
   user.value = authenticatedUser
+  userProfile.value = { role: authenticatedUser.role } // Use actual user role
+  isAdminUser.value = authenticatedUser.role === 'admin'
+  
+  // Store user data for session persistence
+  localStorage.setItem('userData', JSON.stringify(authenticatedUser))
+  
+  startInactivityTimer()
+  setupActivityListeners()
 }
 
 const handleSignOut = async () => {
   clearInactivityTimer()
   removeActivityListeners()
-  await authService.signOut()
+  user.value = null
+  userProfile.value = null
+  isAdminUser.value = false
 }
 
 const startInactivityTimer = () => {
   clearInactivityTimer()
   lastActivityTime.value = Date.now()
   
-  inactivityTimer = setInterval(() => {
+  // Store login time in localStorage for persistence across tabs/refresh
+  localStorage.setItem('loginTime', Date.now().toString())
+  localStorage.setItem('lastActivity', Date.now().toString())
+  
+  activityCheckInterval = setInterval(() => {
     const now = Date.now()
-    const timeSinceLastActivity = now - lastActivityTime.value
+    const storedLastActivity = parseInt(localStorage.getItem('lastActivity') || '0')
+    const timeSinceLastActivity = now - Math.max(lastActivityTime.value, storedLastActivity)
     
     if (timeSinceLastActivity >= INACTIVITY_TIMEOUT) {
       handleInactivityLogout()
     }
-  }, 60000) // Check every minute
+  }, ACTIVITY_CHECK_INTERVAL)
 }
 
 const clearInactivityTimer = () => {
-  if (inactivityTimer) {
-    clearInterval(inactivityTimer)
-    inactivityTimer = null
+  if (activityCheckInterval) {
+    clearInterval(activityCheckInterval)
+    activityCheckInterval = null
   }
+  // Clear localStorage
+  localStorage.removeItem('loginTime')
+  localStorage.removeItem('lastActivity')
+  localStorage.removeItem('userData')
 }
 
 const handleInactivityLogout = async () => {
@@ -99,7 +83,9 @@ const handleInactivityLogout = async () => {
 }
 
 const updateLastActivity = () => {
-  lastActivityTime.value = Date.now()
+  const now = Date.now()
+  lastActivityTime.value = now
+  localStorage.setItem('lastActivity', now.toString())
 }
 
 const setupActivityListeners = () => {
@@ -119,14 +105,35 @@ const removeActivityListeners = () => {
 }
 
 
-const getRoleDisplayName = (role) => {
-  const roleNames = {
-    mentee: 'Mentee',
-    mentor: 'Mentor',
-    admin: 'Administrator'
+const checkExistingSession = () => {
+  const loginTime = localStorage.getItem('loginTime')
+  const lastActivity = localStorage.getItem('lastActivity')
+  const userData = localStorage.getItem('userData')
+  
+  if (loginTime && lastActivity && userData) {
+    const now = Date.now()
+    const timeSinceLastActivity = now - parseInt(lastActivity)
+    
+    if (timeSinceLastActivity < INACTIVITY_TIMEOUT) {
+      // Session is still valid, restore user
+      try {
+        const parsedUser = JSON.parse(userData)
+        user.value = parsedUser
+        userProfile.value = { role: parsedUser.role }
+        isAdminUser.value = parsedUser.role === 'admin'
+        startInactivityTimer()
+        setupActivityListeners()
+      } catch (e) {
+        // Invalid data, clear everything
+        clearInactivityTimer()
+      }
+    } else {
+      // Session expired, clear everything
+      clearInactivityTimer()
+    }
   }
-  return roleNames[role] || 'User'
 }
+
 </script>
 
 <template>
@@ -139,7 +146,7 @@ const getRoleDisplayName = (role) => {
   <div v-else>
     <header>
       <div class="user-info">
-        <span>{{ $t('dashboard.welcome', { email: user.email }) }}</span>
+        <span>{{ $t('dashboard.welcome', { email: user.displayName || user.userid }) }}</span>
         <button @click="handleSignOut" class="sign-out-btn">{{ $t('common.signOut') }}</button>
       </div>
     </header>
@@ -162,26 +169,25 @@ const getRoleDisplayName = (role) => {
             {{ $t('courses.title') }}
           </button>
           <button 
+            @click="activeView = 'mentors'"
+            :class="{ active: activeView === 'mentors' }"
+            class="nav-tab"
+          >
+            {{ $t('mentors.title') }}
+          </button>
+          <button 
             @click="activeView = 'profile'"
             :class="{ active: activeView === 'profile' }"
             class="nav-tab"
           >
             {{ $t('profile.title') }}
           </button>
-          <button 
-            v-if="isAdminUser"
-            @click="activeView = 'permit'"
-            :class="{ active: activeView === 'permit' }"
-            class="nav-tab"
-          >
-            {{ $t('permitio.title') }}
-          </button>
         </div>
         
         <div class="view-content">
           <CourseManagement v-if="activeView === 'courses'" />
+          <MentorsList v-if="activeView === 'mentors'" />
           <UserProfile v-if="activeView === 'profile'" />
-          <PermitSync v-if="activeView === 'permit'" />
         </div>
       </div>
     </main>
@@ -200,22 +206,24 @@ const getRoleDisplayName = (role) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background-color: #f0f0f0;
-  margin-bottom: 1rem;
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-secondary);
+  margin-bottom: var(--spacing-lg);
 }
 
 .sign-out-btn {
-  padding: 0.5rem 1rem;
-  background-color: #f44336;
-  color: white;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-error);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: background-color var(--transition-base);
+  font-weight: var(--font-weight-medium);
 }
 
 .sign-out-btn:hover {
-  background-color: #da190b;
+  background-color: var(--color-error-dark);
 }
 
 header {
@@ -223,18 +231,19 @@ header {
 }
 
 .dashboard {
-  padding: 2rem;
+  padding: var(--spacing-2xl);
 }
 
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-2xl);
 }
 
 .dashboard-header h1 {
   margin: 0;
+  color: var(--color-text-primary);
 }
 
 .user-role {
@@ -243,54 +252,55 @@ header {
 }
 
 .role-badge {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .role-badge.mentee {
-  background-color: #e3f2fd;
-  color: #1976d2;
+  background-color: var(--color-role-mentee-bg);
+  color: var(--color-role-mentee-text);
 }
 
 .role-badge.mentor {
-  background-color: #f3e5f5;
-  color: #7b1fa2;
+  background-color: var(--color-role-mentor-bg);
+  color: var(--color-role-mentor-text);
 }
 
 .role-badge.admin {
-  background-color: #fff3e0;
-  color: #f57c00;
+  background-color: var(--color-role-admin-bg);
+  color: var(--color-role-admin-text);
 }
 
 .navigation-tabs {
   display: flex;
-  border-bottom: 2px solid #e0e0e0;
-  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--color-border-light);
+  margin-bottom: var(--spacing-2xl);
 }
 
 .nav-tab {
   background: none;
   border: none;
-  padding: 1rem 2rem;
+  padding: var(--spacing-lg) var(--spacing-2xl);
   cursor: pointer;
   font-size: 1rem;
-  color: #666;
+  color: var(--color-text-tertiary);
   border-bottom: 2px solid transparent;
-  transition: all 0.3s;
+  transition: all var(--transition-base);
+  font-weight: var(--font-weight-medium);
 }
 
 .nav-tab:hover {
-  color: #333;
-  background-color: #f5f5f5;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
 }
 
 .nav-tab.active {
-  color: #4CAF50;
-  border-bottom-color: #4CAF50;
+  color: var(--color-primary-start);
+  border-bottom-color: var(--color-primary-start);
 }
 
 .view-content {

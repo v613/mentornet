@@ -1,0 +1,123 @@
+/* MentorNet Design System - CSS Variables */
+:root {
+  /* Primary Brand Colors */
+  --color-primary-start: #667eea;
+  --color-primary-end: #764ba2;
+  --color-primary-gradient: linear-gradient(135deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
+  
+  /* Primary Variants */
+  --color-primary-light: #8a9af0;
+  --color-primary-dark: #5a6bd8;
+  --color-primary-hover: var(--color-primary-end);
+  
+  /* Semantic Colors */
+  --color-success: #22c55e;
+  --color-success-light: #bbf7d0;
+  --color-success-dark: #16a34a;
+  
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-warning-dark: #d97706;
+  
+  --color-error: #ef4444;
+  --color-error-light: #fecaca;
+  --color-error-dark: #dc2626;
+  
+  --color-info: var(--color-primary-start);
+  --color-info-light: #dbeafe;
+  --color-info-dark: var(--color-primary-dark);
+  
+  /* Neutral Colors */
+  --color-white: #ffffff;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  
+  /* Text Colors */
+  --color-text-primary: var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-tertiary: var(--color-gray-500);
+  --color-text-inverse: var(--color-white);
+  
+  /* Background Colors */
+  --color-bg-primary: var(--color-white);
+  --color-bg-secondary: var(--color-gray-50);
+  --color-bg-tertiary: var(--color-gray-100);
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* Border Colors */
+  --color-border-light: var(--color-gray-200);
+  --color-border-medium: var(--color-gray-300);
+  --color-border-dark: var(--color-gray-400);
+  --color-border-focus: var(--color-primary-start);
+  
+  /* Component-specific Colors */
+  --color-input-bg: var(--color-white);
+  --color-input-border: var(--color-border-light);
+  --color-input-focus: var(--color-primary-start);
+  --color-input-placeholder: var(--color-text-tertiary);
+  
+  /* Role Badge Colors */
+  --color-role-mentee-bg: #dbeafe;
+  --color-role-mentee-text: #1d4ed8;
+  --color-role-mentor-bg: #f3e8ff;
+  --color-role-mentor-text: #7c3aed;
+  --color-role-admin-bg: #fed7aa;
+  --color-role-admin-text: #ea580c;
+  
+  /* Shadow Values */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-auth-card: 0 8px 32px rgba(102, 126, 234, 0.15);
+  --shadow-button-hover: 0 4px 12px rgba(102, 126, 234, 0.4);
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 0.75rem;   /* 12px */
+  --spacing-lg: 1rem;      /* 16px */
+  --spacing-xl: 1.5rem;    /* 24px */
+  --spacing-2xl: 2rem;     /* 32px */
+  --spacing-3xl: 3rem;     /* 48px */
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-base: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+  
+  /* Typography */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Z-index layers */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}

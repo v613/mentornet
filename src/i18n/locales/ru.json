@@ -19,7 +19,21 @@
     "passwordPlaceholder": "Введите пароль",
     "noAccount": "Нет аккаунта?",
     "haveAccount": "Уже есть аккаунт?",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "errors": {
+      "invalidInput": "Неверные входные параметры",
+      "invalidCredentials": "Неверные учетные данные",
+      "authenticationFailed": "Ошибка аутентификации",
+      "allFieldsRequired": "Все поля обязательны",
+      "inputTooLong": "Ввод превышает максимальную длину",
+      "invalidEmail": "Неверный формат email",
+      "userExists": "Пользователь уже существует",
+      "emailExists": "Email уже существует",
+      "userBlocked": "Учетная запись пользователя заблокирована",
+      "registrationFailed": "Ошибка регистрации",
+      "userNotFound": "Пользователь не найден",
+      "accessDenied": "Доступ запрещен"
+    }
   },
   "courses": {
     "title": "Курсы",
@@ -32,7 +46,43 @@
     "errorApplying": "Ошибка при подаче заявки на курс",
     "errorUpdating": "Ошибка при обновлении курса",
     "loading": "Загрузка курсов...",
-    "noCoursesFound": "Курсы не найдены"
+    "noCoursesFound": "Курсы не найдены",
+    "creator": "Создатель",
+    "enrolled": "Записано",
+    "skills": "Навыки",
+    "created": "Создано",
+    "noDescription": "Описание недоступно",
+    "confirmPublish": "Вы уверены, что хотите опубликовать этот курс?",
+    "confirmArchive": "Вы уверены, что хотите архивировать этот курс?",
+    "confirmSuspend": "Приостановить этот курс?",
+    "status": {
+      "draft": "Черновик",
+      "published": "Опубликован",
+      "archived": "Архивирован",
+      "suspended": "Приостановлен"
+    },
+    "actions": {
+      "publish": "Опубликовать",
+      "archive": "Архивировать", 
+      "edit": "Редактировать",
+      "applications": "Заявки",
+      "apply": "Подать заявку",
+      "full": "Заполнен",
+      "viewDetails": "Просмотр деталей",
+      "moderate": "Модерировать",
+      "details": "Детали"
+    },
+    "empty": {
+      "myCourses": "Вы еще не создали ни одного курса. Нажмите \"Создать курс\", чтобы начать!",
+      "available": "В данный момент нет опубликованных курсов.",
+      "allCourses": "Курсы в системе не найдены.",
+      "default": "Курсы не найдены."
+    }
+  },
+  "mentors": {
+    "title": "Менторы",
+    "noMentors": "В данный момент нет доступных менторов",
+    "total": "менторов"
   },
   "profile": {
     "title": "Профиль",
@@ -56,16 +106,37 @@
     "canCreateCourses": "Может создавать курсы",
     "availability": "Доступность",
     "availableForMentoring": "Доступен для менторской деятельности",
+    "description": "Описание",
+    "descriptionPlaceholder": "Расскажите о себе, своём опыте и целях...",
+    "profileImage": "Изображение профиля",
+    "profileImagePlaceholder": "https://example.com/your-profile-image.jpg",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Подтвердите новый пароль",
+    "changePassword": "Изменить пароль",
+    "passwordSecurity": "Пароль и безопасность",
     "saveProfile": "Сохранить профиль",
     "resetChanges": "Сбросить изменения",
     "saving": "Сохранение...",
     "profileSaved": "Профиль успешно сохранён!",
-    "loadingProfile": "Загрузка профиля..."
-  },
-  "permitio": {
-    "title": "Permit.io",
-    "integration": "Интеграция Permit.io",
-    "manageSync": "Управление синхронизацией пользователей между Firebase и Permit.io"
+    "passwordChanged": "Пароль успешно изменён!",
+    "loadingProfile": "Загрузка профиля...",
+    "errorLoading": "Ошибка загрузки профиля: {error}",
+    "errorSaving": "Ошибка сохранения профиля: {error}",
+    "errorChangingPassword": "Ошибка смены пароля: {error}",
+    "help": {
+      "emailCannotChange": "Email нельзя изменить",
+      "roleRequiresAdmin": "Изменение роли требует одобрения администратора",
+      "skillsRelevant": "Добавьте навыки, связанные с менторством или обучением",
+      "learningGoalsDescription": "Что бы вы хотели изучить или улучшить?",
+      "mentoringCapacityDescription": "Максимальное количество подопечных, которых вы можете вести",
+      "availabilityDescription": "Снимите галочку, если временно недоступны",
+      "descriptionHelp": "Поделитесь своим опытом, интересами и тем, что вы ищете",
+      "profileImageHelp": "URL к вашему изображению профиля (опционально)",
+      "passwordHelp": "Оставьте пустым, чтобы сохранить текущий пароль",
+      "passwordMismatch": "Новые пароли не совпадают",
+      "passwordTooShort": "Пароль должен содержать минимум 6 символов"
+    }
   },
   "dashboard": {
     "welcome": "Добро пожаловать, {email}!",
@@ -78,7 +149,13 @@
   "common": {
     "cancel": "Отмена",
     "signOut": "Выйти",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "unknown": "Неизвестно",
+    "invalidDate": "Неверная дата",
+    "previous": "Предыдущий",
+    "next": "Следующий",
+    "page": "Страница",
+    "of": "из"
   },
   "language": {
     "ro": "Română",

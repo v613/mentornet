@@ -19,7 +19,21 @@
     "passwordPlaceholder": "Enter your password",
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "errors": {
+      "invalidInput": "Invalid input parameters",
+      "invalidCredentials": "Invalid credentials",
+      "authenticationFailed": "Authentication failed",
+      "allFieldsRequired": "All fields are required",
+      "inputTooLong": "Input exceeds maximum length",
+      "invalidEmail": "Invalid email format",
+      "userExists": "User already exists",
+      "emailExists": "Email already exists", 
+      "userBlocked": "User account is blocked",
+      "registrationFailed": "Registration failed",
+      "userNotFound": "User not found",
+      "accessDenied": "Access denied"
+    }
   },
   "courses": {
     "title": "Courses",
@@ -32,7 +46,44 @@
     "errorApplying": "Error applying to course",
     "errorUpdating": "Error updating course",
     "loading": "Loading courses...",
-    "noCoursesFound": "No courses found"
+    "noCoursesFound": "No courses found",
+    "creator": "Creator",
+    "enrolled": "Enrolled",
+    "skills": "Skills",
+    "created": "Created",
+    "noDescription": "No description available",
+    "confirmPublish": "Are you sure you want to publish this course?",
+    "confirmArchive": "Are you sure you want to archive this course?",
+    "confirmSuspend": "Suspend this course?",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived",
+      "suspended": "Suspended"
+    },
+    "actions": {
+      "publish": "Publish",
+      "archive": "Archive", 
+      "edit": "Edit",
+      "applications": "Applications",
+      "apply": "Apply",
+      "full": "Full",
+      "viewDetails": "View Details",
+      "moderate": "Moderate",
+      "details": "Details"
+    },
+    "empty": {
+      "myCourses": "You haven't created any courses yet. Click \"Create Course\" to get started!",
+      "available": "No published courses available at the moment.",
+      "allCourses": "No courses found in the system.",
+      "default": "No courses found."
+    }
+  },
+  "mentors": {
+    "title": "Mentors",
+    "noMentors": "No mentors available at the moment",
+    "total": "mentors",
+    "skills": "Skills & Expertise"
   },
   "profile": {
     "title": "Profile",
@@ -56,16 +107,37 @@
     "canCreateCourses": "Can create courses",
     "availability": "Availability",
     "availableForMentoring": "Available for mentoring activities",
+    "description": "Description",
+    "descriptionPlaceholder": "Tell us about yourself, your experience, and goals...",
+    "profileImage": "Profile Image",
+    "profileImagePlaceholder": "https://example.com/your-profile-image.jpg",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "changePassword": "Change Password",
+    "passwordSecurity": "Password & Security",
     "saveProfile": "Save Profile",
     "resetChanges": "Reset Changes",
     "saving": "Saving...",
     "profileSaved": "Profile saved successfully!",
-    "loadingProfile": "Loading profile..."
-  },
-  "permitio": {
-    "title": "Permit.io",
-    "integration": "Permit.io Integration",
-    "manageSync": "Manage user synchronization between Firebase and Permit.io"
+    "passwordChanged": "Password changed successfully!",
+    "loadingProfile": "Loading profile...",
+    "errorLoading": "Failed to load profile: {error}",
+    "errorSaving": "Failed to save profile: {error}",
+    "errorChangingPassword": "Failed to change password: {error}",
+    "help": {
+      "emailCannotChange": "Email cannot be changed",
+      "roleRequiresAdmin": "Role changes require admin approval",
+      "skillsRelevant": "Add skills relevant to mentoring or learning",
+      "learningGoalsDescription": "What would you like to learn or improve?",
+      "mentoringCapacityDescription": "Maximum number of mentees you can handle",
+      "availabilityDescription": "Uncheck if you're temporarily unavailable",
+      "descriptionHelp": "Share your background, interests, and what you're looking for",
+      "profileImageHelp": "URL to your profile image (optional)",
+      "passwordHelp": "Leave blank to keep current password",
+      "passwordMismatch": "New passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters long"
+    }
   },
   "dashboard": {
     "welcome": "Welcome, {email}!",
@@ -78,7 +150,13 @@
   "common": {
     "cancel": "Cancel",
     "signOut": "Sign Out",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "unknown": "Unknown",
+    "invalidDate": "Invalid date",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
   },
   "language": {
     "ro": "Română",

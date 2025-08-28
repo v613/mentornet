@@ -205,61 +205,66 @@ onMounted(() => {
 .course-management {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--spacing-2xl);
 }
 
 .course-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-2xl);
 }
 
 .course-header h2 {
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
 .create-btn {
-  background-color: #4CAF50;
-  color: white;
+  background: var(--color-primary-gradient);
+  color: var(--color-text-inverse);
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 1rem;
-  transition: background-color 0.3s;
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-base);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .create-btn:hover {
-  background-color: #45a049;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .course-tabs {
   display: flex;
-  margin-bottom: 2rem;
-  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: var(--spacing-2xl);
+  border-bottom: 2px solid var(--color-border-light);
 }
 
 .tab-btn {
   background: none;
   border: none;
-  padding: 1rem 2rem;
+  padding: var(--spacing-lg) var(--spacing-2xl);
   cursor: pointer;
   font-size: 1rem;
-  color: #666;
+  color: var(--color-text-tertiary);
   border-bottom: 2px solid transparent;
-  transition: all 0.3s;
+  transition: all var(--transition-base);
+  font-weight: var(--font-weight-medium);
 }
 
 .tab-btn:hover {
-  color: #333;
-  background-color: #f5f5f5;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
 }
 
 .tab-btn.active {
-  color: #4CAF50;
-  border-bottom-color: #4CAF50;
+  color: var(--color-primary-start);
+  border-bottom-color: var(--color-primary-start);
 }
 
 .course-content {

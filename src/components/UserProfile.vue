@@ -24,7 +24,7 @@
                 readonly
                 class="form-input readonly"
               />
-              <small class="form-help">Email cannot be changed</small>
+              <small class="form-help">{{ $t('profile.help.emailCannotChange') }}</small>
             </div>
 
             <div class="form-group">
@@ -52,7 +52,7 @@
                 <option value="admin" v-if="canChangeRole">Admin</option>
               </select>
               <small class="form-help" v-if="!canChangeRole">
-                Role changes require admin approval
+                {{ $t('profile.help.roleRequiresAdmin') }}
               </small>
             </div>
           </div>
@@ -110,7 +110,7 @@
               :placeholder="$t('profile.skillsPlaceholder')"
               rows="3"
             ></textarea>
-            <small class="form-help">Add skills relevant to mentoring or learning</small>
+            <small class="form-help">{{ $t('profile.help.skillsRelevant') }}</small>
           </div>
 
           <div class="form-group">
@@ -122,7 +122,7 @@
               :placeholder="$t('profile.learningGoalsPlaceholder')"
               rows="3"
             ></textarea>
-            <small class="form-help">What would you like to learn or improve?</small>
+            <small class="form-help">{{ $t('profile.help.learningGoalsDescription') }}</small>
           </div>
         </div>
 
@@ -140,7 +140,7 @@
                 min="1"
                 max="20"
               />
-              <small class="form-help">Maximum number of mentees you can handle</small>
+              <small class="form-help">{{ $t('profile.help.mentoringCapacityDescription') }}</small>
             </div>
 
             <div class="form-group">
@@ -177,7 +177,7 @@
               />
               <span>{{ $t('profile.availableForMentoring') }}</span>
             </label>
-            <small class="form-help">Uncheck if you're temporarily unavailable</small>
+            <small class="form-help">{{ $t('profile.help.availabilityDescription') }}</small>
           </div>
         </div>
       </div>
@@ -202,8 +202,11 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { authService } from '../services/auth.js'
 import { databaseService } from '../services/database.js'
+
+const { t } = useI18n()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -410,45 +413,45 @@ const resetProfile = () => {
 .profile-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--spacing-2xl);
 }
 
 .profile-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: var(--spacing-3xl);
 }
 
 .profile-header h2 {
-  color: #333;
-  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
 }
 
 .profile-description {
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 1rem;
 }
 
 .loading {
   text-align: center;
-  padding: 2rem;
-  color: #666;
+  padding: var(--spacing-2xl);
+  color: var(--color-text-tertiary);
 }
 
 .profile-form {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-base);
   overflow: hidden;
 }
 
 .form-sections {
-  padding: 2rem;
+  padding: var(--spacing-2xl);
 }
 
 .form-section {
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .form-section:last-child {
@@ -458,15 +461,16 @@ const resetProfile = () => {
 }
 
 .form-section h3 {
-  color: #333;
-  margin-bottom: 1.5rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xl);
   font-size: 1.2rem;
+  font-weight: var(--font-weight-semibold);
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  gap: var(--spacing-xl);
 }
 
 .form-group {
@@ -475,31 +479,33 @@ const resetProfile = () => {
 }
 
 .form-group label {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-primary);
 }
 
 .form-input,
 .form-select,
 .form-textarea {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-sm);
   font-size: 1rem;
-  transition: border-color 0.3s;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-base);
 }
 
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: var(--color-input-focus);
 }
 
 .form-input.readonly {
-  background-color: #f5f5f5;
-  color: #666;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-tertiary);
 }
 
 .form-textarea {
@@ -508,9 +514,9 @@ const resetProfile = () => {
 }
 
 .form-help {
-  margin-top: 0.25rem;
+  margin-top: var(--spacing-xs);
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-text-tertiary);
 }
 
 .checkbox-group {
@@ -533,46 +539,50 @@ const resetProfile = () => {
 }
 
 .form-actions {
-  padding: 1.5rem 2rem;
-  background-color: #f9f9f9;
-  border-top: 1px solid #e0e0e0;
+  padding: var(--spacing-xl) var(--spacing-2xl);
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border-light);
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-lg);
   justify-content: flex-end;
 }
 
 .btn-primary,
 .btn-secondary {
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  font-weight: 600;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all var(--transition-base);
   border: none;
 }
 
 .btn-primary {
-  background-color: #4CAF50;
-  color: white;
+  background: var(--color-primary-gradient);
+  color: var(--color-text-inverse);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #45a049;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-primary:disabled {
-  background-color: #ccc;
+  background: var(--color-gray-300);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-secondary {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-medium);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: #e9e9e9;
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-dark);
 }
 
 .btn-secondary:disabled {
@@ -581,22 +591,22 @@ const resetProfile = () => {
 }
 
 .result-message {
-  margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 4px;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-sm);
   text-align: center;
 }
 
 .result-message.success {
-  background-color: #f0f8f0;
-  color: #4CAF50;
-  border: 1px solid #4CAF50;
+  background-color: var(--color-success-light);
+  color: var(--color-success-dark);
+  border: 1px solid var(--color-success);
 }
 
 .result-message.error {
-  background-color: #fff0f0;
-  color: #f44336;
-  border: 1px solid #f44336;
+  background-color: var(--color-error-light);
+  color: var(--color-error-dark);
+  border: 1px solid var(--color-error);
 }
 
 @media (max-width: 768px) {

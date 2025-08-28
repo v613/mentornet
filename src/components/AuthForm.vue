@@ -11,7 +11,7 @@
       <h2>{{ $t(isLogin ? 'auth.signIn' : 'auth.signUp') }}</h2>
       
       <form @submit.prevent="handleSubmit">
-        <div class="form-group" v-if="!isLogin">
+        <div class="form-group">
           <label for="username">{{ $t('auth.username') }}</label>
           <input
             id="username"
@@ -22,7 +22,7 @@
           />
         </div>
         
-        <div class="form-group">
+        <div class="form-group" v-if="!isLogin">
           <label for="email">{{ $t('auth.email') }}</label>
           <input
             id="email"
@@ -66,10 +66,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import { authService } from '../services/auth'
+import { useI18n } from 'vue-i18n'
+import { databaseService } from '../services/database.js'
 import LanguageSwitcher from './LanguageSwitcher.vue'
 
 const emit = defineEmits(['auth-success'])
+const { t } = useI18n()
 
 const isLogin = ref(true)
 const username = ref('')
@@ -88,20 +90,55 @@ const handleSubmit = async () => {
   error.value = ''
   
   try {
-    let result
-    
     if (isLogin.value) {
-      result = await authService.signIn(email.value, password.value)
+      // Database authentication for login with i18n
+      const result = await databaseService.authenticateUser(
+        username.value, // Use username as userid
+        password.value,
+        t // Pass translation function
+      )
+      
+      if (result.success) {
+        const authUser = {
+          uid: result.user.id,
+          id: result.user.id,
+          userid: result.user.userid,
+          email: result.user.email,
+          displayName: result.user.displayName,
+          role: result.user.role,
+          isBlocked: result.user.isBlocked
+        }
+        emit('auth-success', authUser)
+      } else {
+        error.value = result.error
+      }
     } else {
-      result = await authService.signUp(email.value, password.value, username.value)
-    }
-    
-    if (result.success) {
-      emit('auth-success', result.user)
-    } else {
-      error.value = result.error
+      // Database registration for signup with i18n
+      const result = await databaseService.registerUser(
+        username.value,
+        email.value,
+        password.value,
+        t // Pass translation function
+      )
+      
+      if (result.success) {
+        // Auto-login after successful registration
+        const authUser = {
+          uid: result.user.id,
+          id: result.user.id,
+          userid: result.user.userid,
+          email: result.user.email,
+          displayName: result.user.displayName,
+          role: result.user.role,
+          isBlocked: result.user.isBlocked
+        }
+        emit('auth-success', authUser)
+      } else {
+        error.value = result.error
+      }
     }
   } catch (err) {
+    console.error('Auth error:', err)
     error.value = 'An unexpected error occurred'
   } finally {
     loading.value = false
@@ -113,8 +150,8 @@ const handleSubmit = async () => {
 <style scoped>
 .page-background {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 1rem;
+  background: var(--color-primary-gradient);
+  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -123,13 +160,13 @@ const handleSubmit = async () => {
 
 .brand-header {
   text-align: center;
-  margin-bottom: 2rem;
-  color: white;
+  margin-bottom: var(--spacing-2xl);
+  color: var(--color-text-inverse);
 }
 
 .brand-title {
   font-size: 3rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin: 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: -1px;
@@ -137,9 +174,9 @@ const handleSubmit = async () => {
 
 .brand-subtitle {
   font-size: 1.1rem;
-  margin: 0.5rem 0 0 0;
+  margin: var(--spacing-sm) 0 0 0;
   opacity: 0.9;
-  font-weight: 300;
+  font-weight: var(--font-weight-normal);
 }
 
 .auth-container {
@@ -148,94 +185,104 @@ const handleSubmit = async () => {
 }
 
 .auth-form {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: var(--color-bg-primary);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-auth-card);
   backdrop-filter: blur(10px);
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333;
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-text-primary);
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
-  color: #555;
-  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
 }
 
 input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-sm);
   font-size: 1rem;
   box-sizing: border-box;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-base);
 }
 
 input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--color-input-focus);
+}
+
+input::placeholder {
+  color: var(--color-input-placeholder);
 }
 
 button[type="submit"] {
   width: 100%;
-  padding: 0.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: var(--spacing-md);
+  background: var(--color-primary-gradient);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-base);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 button[type="submit"]:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: var(--shadow-button-hover);
 }
 
 button[type="submit"]:disabled {
-  background-color: #cccccc;
+  background: var(--color-gray-300);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .error-message {
-  color: #f44336;
+  color: var(--color-error);
   text-align: center;
-  margin-top: 1rem;
+  margin-top: var(--spacing-lg);
   font-size: 0.9rem;
 }
 
 .toggle-mode {
   text-align: center;
-  margin-top: 1.5rem;
-  color: #666;
+  margin-top: var(--spacing-xl);
+  color: var(--color-text-tertiary);
 }
 
 .link-button {
   background: none;
   border: none;
-  color: #667eea;
+  color: var(--color-primary-start);
   cursor: pointer;
   text-decoration: underline;
   font-size: inherit;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--transition-base);
 }
 
 .link-button:hover {
-  color: #764ba2;
+  color: var(--color-primary-hover);
 }
 
 
