@@ -68,6 +68,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { databaseService } from '../services/database.js'
+import { tokenService } from '../services/tokenService.js'
 import LanguageSwitcher from './LanguageSwitcher.vue'
 
 const emit = defineEmits(['auth-success'])
@@ -108,6 +109,14 @@ const handleSubmit = async () => {
           role: result.user.role,
           isBlocked: result.user.isBlocked
         }
+        
+        // Generate and store JWT token asynchronously
+        tokenService.generateToken(result.user).then(token => {
+          if (token) {
+            tokenService.storeToken(token)
+          }
+        })
+        
         emit('auth-success', authUser)
       } else {
         error.value = result.error
@@ -132,6 +141,14 @@ const handleSubmit = async () => {
           role: result.user.role,
           isBlocked: result.user.isBlocked
         }
+        
+        // Generate and store JWT token asynchronously
+        tokenService.generateToken(result.user).then(token => {
+          if (token) {
+            tokenService.storeToken(token)
+          }
+        })
+        
         emit('auth-success', authUser)
       } else {
         error.value = result.error

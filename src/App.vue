@@ -4,133 +4,42 @@ import AuthForm from './components/AuthForm.vue'
 import CourseManagement from './components/CourseManagement.vue'
 import UserProfile from './components/UserProfile.vue'
 import MentorsList from './components/MentorsList.vue'
+import { tokenService } from './services/tokenService.js'
 
 const user = ref(null)
 const userProfile = ref(null)
 const loading = ref(true)
 const activeView = ref('courses')
 const isAdminUser = ref(false)
-let inactivityTimer = null
-let activityCheckInterval = null
-let lastActivityTime = ref(Date.now())
-const INACTIVITY_TIMEOUT = 30 * 60 * 1000 // 30 minutes in milliseconds
-const ACTIVITY_CHECK_INTERVAL = 60 * 1000 // Check every 1 minute
 
-onMounted(() => {
-  // Check if user should still be logged in
-  checkExistingSession()
+onMounted(async () => {
+  await checkExistingSession()
   loading.value = false
-})
-
-onUnmounted(() => {
-  clearInactivityTimer()
-  removeActivityListeners()
 })
 
 const handleAuthSuccess = (authenticatedUser) => {
   user.value = authenticatedUser
-  userProfile.value = { role: authenticatedUser.role } // Use actual user role
+  userProfile.value = { role: authenticatedUser.role }
   isAdminUser.value = authenticatedUser.role === 'admin'
-  
-  // Store user data for session persistence
-  localStorage.setItem('userData', JSON.stringify(authenticatedUser))
-  
-  startInactivityTimer()
-  setupActivityListeners()
 }
 
 const handleSignOut = async () => {
-  clearInactivityTimer()
-  removeActivityListeners()
+  tokenService.removeToken()
   user.value = null
   userProfile.value = null
   isAdminUser.value = false
 }
 
-const startInactivityTimer = () => {
-  clearInactivityTimer()
-  lastActivityTime.value = Date.now()
-  
-  // Store login time in localStorage for persistence across tabs/refresh
-  localStorage.setItem('loginTime', Date.now().toString())
-  localStorage.setItem('lastActivity', Date.now().toString())
-  
-  activityCheckInterval = setInterval(() => {
-    const now = Date.now()
-    const storedLastActivity = parseInt(localStorage.getItem('lastActivity') || '0')
-    const timeSinceLastActivity = now - Math.max(lastActivityTime.value, storedLastActivity)
-    
-    if (timeSinceLastActivity >= INACTIVITY_TIMEOUT) {
-      handleInactivityLogout()
+const checkExistingSession = async () => {
+  if (await tokenService.isTokenValid()) {
+    const userData = await tokenService.getCurrentUser()
+    if (userData) {
+      user.value = userData
+      userProfile.value = { role: userData.role }
+      isAdminUser.value = userData.role === 'admin'
     }
-  }, ACTIVITY_CHECK_INTERVAL)
-}
-
-const clearInactivityTimer = () => {
-  if (activityCheckInterval) {
-    clearInterval(activityCheckInterval)
-    activityCheckInterval = null
-  }
-  // Clear localStorage
-  localStorage.removeItem('loginTime')
-  localStorage.removeItem('lastActivity')
-  localStorage.removeItem('userData')
-}
-
-const handleInactivityLogout = async () => {
-  alert('You have been automatically logged out due to inactivity.')
-  await handleSignOut()
-}
-
-const updateLastActivity = () => {
-  const now = Date.now()
-  lastActivityTime.value = now
-  localStorage.setItem('lastActivity', now.toString())
-}
-
-const setupActivityListeners = () => {
-  const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
-  
-  events.forEach(event => {
-    document.addEventListener(event, updateLastActivity, { passive: true })
-  })
-}
-
-const removeActivityListeners = () => {
-  const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
-  
-  events.forEach(event => {
-    document.removeEventListener(event, updateLastActivity)
-  })
-}
-
-
-const checkExistingSession = () => {
-  const loginTime = localStorage.getItem('loginTime')
-  const lastActivity = localStorage.getItem('lastActivity')
-  const userData = localStorage.getItem('userData')
-  
-  if (loginTime && lastActivity && userData) {
-    const now = Date.now()
-    const timeSinceLastActivity = now - parseInt(lastActivity)
-    
-    if (timeSinceLastActivity < INACTIVITY_TIMEOUT) {
-      // Session is still valid, restore user
-      try {
-        const parsedUser = JSON.parse(userData)
-        user.value = parsedUser
-        userProfile.value = { role: parsedUser.role }
-        isAdminUser.value = parsedUser.role === 'admin'
-        startInactivityTimer()
-        setupActivityListeners()
-      } catch (e) {
-        // Invalid data, clear everything
-        clearInactivityTimer()
-      }
-    } else {
-      // Session expired, clear everything
-      clearInactivityTimer()
-    }
+  } else {
+    tokenService.removeToken()
   }
 }
 

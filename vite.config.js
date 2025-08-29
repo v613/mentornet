@@ -22,7 +22,8 @@ export default defineConfig(() => {
     },
     define: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'process.env.NETLIFY_DATABASE_URL': JSON.stringify(process.env.NETLIFY_DATABASE_URL)
+      'process.env.NETLIFY_DATABASE_URL': JSON.stringify(process.env.NETLIFY_DATABASE_URL),
+      'process.env.JWT_SECRET': JSON.stringify(process.env.JWT_SECRET)
     }
   }
 })
