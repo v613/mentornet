@@ -1,47 +1,110 @@
 # MentorNet Platform
 [![Netlify Status](https://api.netlify.com/api/v1/badges/448ea9dc-ad24-4d1f-bbd9-d8f2cb9ce8bf/deploy-status)](https://app.netlify.com/projects/mentoras/deploys)
 
+> **🤖 AI-Generated Project**: This entire project was developed using AI assistance, showcasing modern AI-powered software development capabilities.
+
 **Connecting learners with mentors, forming a network for personalized guidance and training.**
 
-MentorNet is a comprehensive platform that enables users to find mentorship, share knowledge, and grow together. It builds a supportive community for skill development and professional growth, featuring a complete course management system with role-based access control.
+MentorNet is an **alternative frontend** to the existing [mentorme.md](https://mentorme.md) website, providing a comprehensive platform that enables users to find mentorship, share knowledge, and grow together. It builds a supportive community for skill development and professional growth, featuring a complete course management system with role-based access control.
 
 ## 🌟 Features
 
-### 🔐 **Role-Based System**
-- **3-Tier User Roles**: Mentee (learners) → Mentor (course creators) → Admin (full management)
-- **ABAC Security**: Attribute-Based Access Control with granular permissions
-- **Dynamic Permissions**: Context-aware access based on user attributes, capacity, and time constraints
-- **Auto-logout**: Automatic session termination after 30 minutes of inactivity
+### 🔐 **Authentication & Security**
+- **JWT-Based Authentication**: Secure token-based login system with PostgreSQL backend
+- **1-Minute Sessions**: Short-lived JWT tokens for enhanced security
+- **Secure Storage**: HTTP-only cookies with SameSite protection
+- **Role-Based Access**: User roles (Mentee, Mentor, Admin) with appropriate permissions
+- **Automatic Logout**: Session expiry with clean token removal
 
-### 📚 **Course Management**
-- **Course Creation**: Mentors can create comprehensive courses with skills, prerequisites, and objectives
-- **Enrollment System**: Application-based course enrollment with approval workflows
-- **Course Lifecycle**: Draft → Published → Archived status management
-- **Capacity Management**: Automatic enforcement of mentor capacity limits
+### 👥 **User Management**
+- **User Registration**: Create new accounts with username, email, and password
+- **Profile Management**: View and edit user profiles
+- **Role System**: Three-tier user hierarchy with role-based UI adaptation
+- **User Authentication**: Secure login with database validation
 
-### 💬 **Session Management**
-- **Scheduled Sessions**: Time-based session scheduling with working hours enforcement
-- **Real-time Updates**: Live session status updates and messaging
-- **Feedback System**: Post-session ratings and reviews
-- **Participant Management**: Secure access control for session participants
-
-### 🎯 **User Experience**
-- **User Authentication**: Secure Firebase-based authentication with email/password
-- **Responsive Design**: Mobile-first responsive interface with modern UI/UX
+### 🎯 **User Interface**
+- **Modern Vue 3**: Built with Vue 3 Composition API for optimal performance
+- **Responsive Design**: Mobile-first responsive interface with modern UI/UX  
 - **Multilingual Support**: i18n support for authentication pages (Romanian, English, Russian)
-- **Role-Based UI**: Dynamic interface adaptation based on user permissions
-- **Real-time Data**: Firebase-powered live updates across all components
+- **Tabbed Navigation**: Clean interface with courses, mentors, and profile tabs
+- **Real-time Validation**: Form validation with user feedback
 
 ## 🚀 Tech Stack
 
 - **Frontend**: Vue 3 with Composition API
 - **Build Tool**: Vite 7.x for fast development and optimized builds
-- **Database**: Firebase Firestore NoSQL database with advanced security rules
-- **Authentication**: Firebase Authentication with role-based extensions
-- **Access Control**: Custom ABAC (Attribute-Based Access Control) implementation
-- **Real-time**: Firebase real-time subscriptions and live updates
+- **Database**: Neon PostgreSQL with Drizzle ORM
+- **Authentication**: JWT-based authentication with secure cookie storage
+- **Session Management**: JSON Web Tokens (JWT) with 1-minute expiry
+- **Database Connection**: @neondatabase/serverless with connection pooling
+- **Schema Management**: Drizzle Kit for migrations and database management
 - **Internationalization**: Vue i18n for multi-language support (auth pages only)
 - **Styling**: Modern CSS with responsive design principles and mobile-first approach
+
+## 🏗️ Project Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        A[Vue 3 + Vite Application]
+        B[JWT Token Service]
+        C[Database Service]
+        D[Authentication Components]
+        E[Course Management]
+        F[User Profile Management]
+    end
+    
+    subgraph "Authentication & Session"
+        G[JWT Tokens - 1min expiry]
+        H[HTTP-only Cookies]
+        I[Session Validation]
+    end
+    
+    subgraph "Database Layer"
+        J[(Neon PostgreSQL)]
+        K[Drizzle ORM]
+        L[Connection Pool]
+    end
+    
+    subgraph "Database Tables"
+        M[Users Table]
+        N[Courses Table]
+        O[Sessions Table]
+        P[Reviews Table]
+    end
+    
+    subgraph "External Services"
+        Q[Netlify Hosting]
+        R[mentorme.md - Original Site]
+    end
+    
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    A --> F
+    
+    B --> G
+    G --> H
+    H --> I
+    
+    C --> K
+    K --> L
+    L --> J
+    
+    J --> M
+    J --> N
+    J --> O
+    J --> P
+    
+    A --> Q
+    Q -.-> R
+    
+    style A fill:#e1f5fe
+    style J fill:#f3e5f5
+    style G fill:#fff3e0
+    style Q fill:#e8f5e8
+```
 
 ## 🛠️ Installation & Setup
 
@@ -49,7 +112,7 @@ MentorNet is a comprehensive platform that enables users to find mentorship, sha
 
 - Node.js 20.19+ or 22.12+
 - npm or yarn package manager
-- Firebase project with Authentication and Firestore enabled
+- Neon PostgreSQL database
 - Environment variables configured (see below)
 
 ### 1. Clone the Repository
@@ -67,23 +130,29 @@ npm install
 
 ### 3. Configure Environment Variables
 
-Create a `.env` file in the root directory with your Firebase configuration:
+Create a `.env` file in the root directory with your database configuration:
 
 ```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
+NETLIFY_DATABASE_URL=your_neon_database_url
+NETLIFY_DATABASE_URL_UNPOOLED=your_neon_unpooled_url
+JWT_SECRET=your_jwt_secret_key
 ```
 
-### 4. Deploy Firestore Security Rules
+### 4. Set Up Database Schema
 
-Deploy the enhanced security rules to your Firebase project:
+Generate and run database migrations:
 
 ```bash
-firebase deploy --only firestore:rules
+npm run db:generate
+npm run db:migrate
+```
+
+### 5. Access Database Studio (Optional)
+
+View and manage your database:
+
+```bash
+npm run db:studio
 ```
 
 ## 🚀 Development
@@ -126,21 +195,21 @@ npm run build
 
 ## 🔐 Security Features
 
-### **ABAC (Attribute-Based Access Control)**
-The platform implements a comprehensive ABAC system with:
+### **JWT Token-Based Authentication**
+The platform implements secure JWT authentication with:
 
-- **User Attributes**: Role, experience, skills, capacity, permissions
-- **Resource-Based Access**: Different permissions for courses, sessions, users
-- **Contextual Constraints**: Time-based (working hours), capacity-based limits
-- **Dynamic Evaluation**: Real-time permission checking based on current state
+- **Short-lived Tokens**: 1-minute token expiry for enhanced security
+- **Secure Storage**: HTTP-only cookies with SameSite protection
+- **Automatic Refresh**: Session validation on page load
+- **Secure Logout**: Complete token removal and cleanup
 
-### **Firestore Security Rules**
-Advanced server-side security with:
-- Role-based access control
-- Attribute validation
-- Temporal constraints (future scheduling only)
-- Capacity enforcement
-- Audit trail support
+### **Database Security**
+PostgreSQL-based security with:
+- Role-based access control at database level
+- Input validation and sanitization
+- Prepared statements preventing SQL injection
+- Connection pooling with secure credentials
+- Environment-based configuration
 
 ## 🌍 Internationalization
 
@@ -152,55 +221,21 @@ Multilingual support is available for authentication pages only:
 
 Language files are located in `src/i18n/locales/`. The main application interface uses English for consistency across roles and features.
 
-## 🏗️ Architecture
-
-### **Database Collections**
-- `users` - User profiles with roles and attributes
-- `courses` - Course information with creator and enrollment data
-- `course_applications` - Course enrollment applications
-- `sessions` - Mentoring sessions with participants
-- `reviews` - User reviews and ratings
-- `analytics` - System analytics (admin-only)
-- `audit_logs` - Access control audit trail (admin-only)
-
-### **Key Services**
-- `authService` - Authentication and role management
-- `databaseService` - Firestore operations with role validation
-- `abacService` - Client-side access control policy evaluation
-
-### **Components Structure**
-- **Course Management**: `CourseManagement`, `CourseList`, `CreateCourse`, `CourseDetails`
-- **Session Management**: `SessionManagement`, `SessionList`, `SessionDetails`
-- **Authentication**: `AuthForm`, `LanguageSwitcher`
-
 ## 🛡️ Production Deployment
 
-### Firebase Configuration
-1. Configure Firebase project with Authentication and Firestore
-2. Deploy security rules: `firebase deploy --only firestore:rules`
-3. Set up environment variables in your hosting platform
-4. Enable required authentication providers in Firebase Console
+### Database Configuration
+1. Set up Neon PostgreSQL database with connection pooling
+2. Configure environment variables for database URLs
+3. Run database migrations: `npm run db:migrate`
+4. Verify database connection and schema
 
 ### Security Checklist
-- ✅ Firestore security rules deployed
-- ✅ Environment variables secured
-- ✅ ABAC policies validated
-- ✅ Audit logging enabled
-- ✅ Session timeout configured (30min)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes following the ABAC security model
-4. Test role-based access controls
-5. Run security checks: `npm audit`
-6. Submit a pull request
+- ✅ Database credentials secured in environment variables
+- ✅ JWT secret key configured and secured
+- ✅ HTTP-only cookies enabled
+- ✅ Session timeout configured (1 minute)
+- ✅ SQL injection protection with prepared statements
 
 ## 🆘 Support
 
 For support and questions, please contact the development team or create an issue in the repository.
-
-## 📝 License
-
-This project is part of the MentorNet ecosystem. Please refer to the license file for usage terms and conditions.
