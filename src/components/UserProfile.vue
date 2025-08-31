@@ -211,7 +211,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { databaseService } from '../services/database.js'
+import { apiService } from '../services/api.js'
 
 const { t } = useI18n()
 
@@ -284,12 +284,11 @@ onMounted(async () => {
 const loadProfile = async () => {
   loading.value = true
   try {
-    const currentUserId = databaseService.getCurrentUserId()
-    if (!currentUserId) {
+    if (!apiService.isAuthenticated()) {
       throw new Error('No current user')
     }
 
-    const userData = await databaseService.getUserWithRoles(currentUserId)
+    const userData = await apiService.getUserWithRoles()
     if (userData) {
       profile.value = {
         email: userData.email,
@@ -337,8 +336,7 @@ const saveProfile = async () => {
   saveResult.value = null
   
   try {
-    const currentUserId = databaseService.getCurrentUserId()
-    if (!currentUserId) {
+    if (!apiService.isAuthenticated()) {
       throw new Error('No current user')
     }
 
@@ -356,7 +354,7 @@ const saveProfile = async () => {
       availableForMentoring: profile.value.attributes.availableForMentoring
     }
 
-    const result = await databaseService.updateUserProfile(currentUserId, updateData)
+    const result = await apiService.updateUserProfile(updateData)
     
     if (!result.success) {
       throw new Error(result.error)
@@ -364,8 +362,7 @@ const saveProfile = async () => {
 
     // Change password if provided
     if (passwordData.value.currentPassword && passwordData.value.newPassword) {
-      const passwordResult = await databaseService.changePassword(
-        currentUserId,
+      const passwordResult = await apiService.changePassword(
         passwordData.value.currentPassword,
         passwordData.value.newPassword
       )

@@ -299,7 +299,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { databaseService } from '../services/database'
+import { apiService } from '../services/api.js'
 
 const props = defineProps({
   editMode: {
@@ -459,10 +459,10 @@ const submitCourse = async (status) => {
     let result
     if (props.editMode && props.courseData) {
       // Update existing course
-      result = await databaseService.updateCourse(props.courseData.courseId, courseData)
+      result = await apiService.updateCourse(props.courseData.courseId, courseData)
     } else {
       // Create new course
-      result = await databaseService.createCourse(courseData)
+      result = await apiService.createCourse(courseData)
     }
     
     if (result.success) {

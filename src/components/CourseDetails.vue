@@ -237,7 +237,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { databaseService } from '../services/database'
+import { apiService } from '../services/api.js'
 
 const { t } = useI18n()
 
@@ -275,9 +275,11 @@ const showTimeSlotSelection = ref(false)
 onMounted(async () => {
   // Get current user information
   try {
-    const userId = databaseService.getCurrentUserId()
-    if (userId) {
-      currentUser.value = { uid: userId }
+    if (apiService.isAuthenticated()) {
+      const user = apiService.getCurrentUserFromToken()
+      if (user) {
+        currentUser.value = { uid: user.userId || user.id }
+      }
     }
   } catch (error) {
     console.error('Error getting current user:', error)
@@ -312,10 +314,8 @@ const formatDate = (timestamp) => {
 
 const loadApplications = async () => {
   try {
-    const result = await databaseService.getCourseApplications(props.course.courseId)
-    if (result.success) {
-      applications.value = result.applications
-    }
+    const result = await apiService.getCourseApplications(props.course.courseId)
+    applications.value = result.applications || []
   } catch (error) {
     console.error('Error loading applications:', error)
   }
@@ -323,7 +323,7 @@ const loadApplications = async () => {
 
 const updateApplicationStatus = async (applicationId, status) => {
   try {
-    const result = await databaseService.updateApplicationStatus(applicationId, status)
+    const result = await apiService.updateApplicationStatus(props.course.courseId, applicationId, status)
     if (result.success) {
       // Update local application status
       const app = applications.value.find(a => a.id === applicationId)
@@ -386,10 +386,7 @@ const applyCourse = async () => {
     // Try to get user profile data for defaults
     let profileData = {}
     try {
-      const profileResult = await databaseService.getUserProfile()
-      if (profileResult.success) {
-        profileData = profileResult.user || {}
-      }
+      profileData = await apiService.getUserWithRoles()
     } catch (error) {
       console.log('Could not load profile data for application')
     }
@@ -417,7 +414,11 @@ const applyCourse = async () => {
     }
     
     if (applicationData.motivation) {
-      const result = await databaseService.applyToCourse(props.course.courseId, applicationData)
+      const result = await apiService.applyToCourse(
+        props.course.courseId, 
+        applicationData.motivation, 
+        applicationData.experience
+      )
       if (result.success) {
         saveResult.value = {
           type: 'success',
@@ -470,7 +471,12 @@ const submitTimeSlotApplication = async () => {
   
   if (applicationData.motivation) {
     try {
-      const result = await databaseService.applyToCourse(props.course.courseId, applicationData)
+      const result = await apiService.applyToCourse(
+        props.course.courseId, 
+        applicationData.motivation, 
+        applicationData.experience, 
+        applicationData.timeSlotId
+      )
       if (result.success) {
         saveResult.value = {
           type: 'success',

@@ -33,10 +33,12 @@ MentorNet is an **alternative frontend** to the existing [mentorme.md](https://m
 
 - **Frontend**: Vue 3 with Composition API
 - **Build Tool**: Vite 7.x for fast development and optimized builds
+- **Backend**: Netlify Functions (serverless architecture)
 - **Database**: Neon PostgreSQL with Drizzle ORM
 - **Authentication**: JWT-based authentication with secure cookie storage
-- **Session Management**: JSON Web Tokens (JWT) with 1-minute expiry
-- **Database Connection**: @neondatabase/serverless with connection pooling
+- **API Layer**: RESTful API via Netlify Functions with secure database access
+- **Session Management**: JSON Web Tokens (JWT) with automatic refresh
+- **Database Connection**: @neondatabase/serverless with connection pooling (server-side only)
 - **Schema Management**: Drizzle Kit for migrations and database management
 - **Internationalization**: Vue i18n for multi-language support (auth pages only)
 - **Styling**: Modern CSS with responsive design principles and mobile-first approach
@@ -48,34 +50,42 @@ graph TB
     subgraph "Frontend Layer"
         A[Vue 3 + Vite Application]
         B[JWT Token Service]
-        C[Database Service]
+        C[API Service Client]
         D[Authentication Components]
         E[Course Management]
         F[User Profile Management]
     end
     
-    subgraph "Authentication & Session"
-        G[JWT Tokens - 1min expiry]
-        H[HTTP-only Cookies]
-        I[Session Validation]
+    subgraph "API Layer (Netlify Functions)"
+        G[Auth Functions]
+        H[User Functions]
+        I[Course Functions]
+        J[Mentor Functions]
     end
     
-    subgraph "Database Layer"
-        J[(Neon PostgreSQL)]
-        K[Drizzle ORM]
-        L[Connection Pool]
+    subgraph "Authentication & Session"
+        K[JWT Tokens with Auto-refresh]
+        L[HTTP-only Cookies]
+        M[Session Validation]
+    end
+    
+    subgraph "Database Layer (Server-side Only)"
+        N[(Neon PostgreSQL)]
+        O[Drizzle ORM]
+        P[Connection Pool]
     end
     
     subgraph "Database Tables"
-        M[Users Table]
-        N[Courses Table]
-        O[Sessions Table]
-        P[Reviews Table]
+        Q[Users Table]
+        R[Courses Table]
+        S[Applications Table]
+        T[Sessions Table]
+        U[Reviews Table]
     end
     
-    subgraph "External Services"
-        Q[Netlify Hosting]
-        R[mentorme.md - Original Site]
+    subgraph "Deployment"
+        V[Netlify Hosting]
+        W[mentorme.md - Original Site]
     end
     
     A --> B
@@ -84,26 +94,40 @@ graph TB
     A --> E
     A --> F
     
-    B --> G
-    G --> H
-    H --> I
+    C --> G
+    C --> H
+    C --> I
+    C --> J
     
-    C --> K
+    B --> K
     K --> L
-    L --> J
+    L --> M
     
-    J --> M
-    J --> N
+    G --> O
+    H --> O
+    I --> O
     J --> O
-    J --> P
     
-    A --> Q
-    Q -.-> R
+    O --> P
+    P --> N
+    
+    N --> Q
+    N --> R
+    N --> S
+    N --> T
+    N --> U
+    
+    A --> V
+    V -.-> W
     
     style A fill:#e1f5fe
-    style J fill:#f3e5f5
-    style G fill:#fff3e0
-    style Q fill:#e8f5e8
+    style N fill:#f3e5f5
+    style K fill:#fff3e0
+    style V fill:#e8f5e8
+    style G fill:#e8f5e8
+    style H fill:#e8f5e8
+    style I fill:#e8f5e8
+    style J fill:#e8f5e8
 ```
 
 ## 🛠️ Installation & Setup
@@ -111,7 +135,7 @@ graph TB
 ### Prerequisites
 
 - Node.js 20.19+ or 22.12+
-- npm or yarn package manager
+- `npm` or `pnpm` package manager
 - Neon PostgreSQL database
 - Environment variables configured (see below)
 
@@ -136,23 +160,6 @@ Create a `.env` file in the root directory with your database configuration:
 NETLIFY_DATABASE_URL=your_neon_database_url
 NETLIFY_DATABASE_URL_UNPOOLED=your_neon_unpooled_url
 JWT_SECRET=your_jwt_secret_key
-```
-
-### 4. Set Up Database Schema
-
-Generate and run database migrations:
-
-```bash
-npm run db:generate
-npm run db:migrate
-```
-
-### 5. Access Database Studio (Optional)
-
-View and manage your database:
-
-```bash
-npm run db:studio
 ```
 
 ## 🚀 Development
@@ -203,13 +210,14 @@ The platform implements secure JWT authentication with:
 - **Automatic Refresh**: Session validation on page load
 - **Secure Logout**: Complete token removal and cleanup
 
-### **Database Security**
-PostgreSQL-based security with:
-- Role-based access control at database level
-- Input validation and sanitization
-- Prepared statements preventing SQL injection
-- Connection pooling with secure credentials
-- Environment-based configuration
+### **API & Database Security**
+Serverless architecture with enhanced security:
+- **Netlify Functions**: Secure server-side API endpoints
+- **Database Isolation**: No direct client-to-database connections
+- **Input Validation**: Server-side validation and sanitization
+- **SQL Injection Protection**: Prepared statements with Drizzle ORM
+- **Environment Variables**: Secure credential management
+- **Connection Pooling**: Server-side database connection management
 
 ## 🌍 Internationalization
 
@@ -221,20 +229,14 @@ Multilingual support is available for authentication pages only:
 
 Language files are located in `src/i18n/locales/`. The main application interface uses English for consistency across roles and features.
 
-## 🛡️ Production Deployment
-
-### Database Configuration
-1. Set up Neon PostgreSQL database with connection pooling
-2. Configure environment variables for database URLs
-3. Run database migrations: `npm run db:migrate`
-4. Verify database connection and schema
-
 ### Security Checklist
-- ✅ Database credentials secured in environment variables
+- ✅ Database credentials secured in Netlify environment variables
 - ✅ JWT secret key configured and secured
-- ✅ HTTP-only cookies enabled
-- ✅ Session timeout configured (1 minute)
+- ✅ HTTP-only cookies enabled with SameSite protection
+- ✅ Client-side database access completely removed
+- ✅ All database operations secured via Netlify Functions
 - ✅ SQL injection protection with prepared statements
+- ✅ API rate limiting and validation implemented
 
 ## 🆘 Support
 

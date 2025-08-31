@@ -82,7 +82,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { databaseService } from '../services/database'
+import { apiService } from '../services/api.js'
 import { abacService } from '../services/abac'
 import { tokenService } from '../services/tokenService'
 import CourseList from './CourseList.vue'
@@ -176,10 +176,8 @@ onMounted(async () => {
 
 const loadCourses = async () => {
   try {
-    const result = await databaseService.getCourses(1, 10)
-    if (result.success) {
-      courses.value = result.courses
-    }
+    const result = await apiService.getCourses(1, 10)
+    courses.value = result.courses
   } catch (error) {
     console.error('Error loading courses:', error)
   }
@@ -187,10 +185,8 @@ const loadCourses = async () => {
 
 const loadEnrolledCourses = async () => {
   try {
-    const result = await databaseService.getMenteeEnrolledCourses(currentUser.value.uid)
-    if (result.success) {
-      enrolledCourses.value = result.courses
-    }
+    const result = await apiService.getMenteeEnrolledCourses()
+    enrolledCourses.value = result
   } catch (error) {
     console.error('Error loading enrolled courses:', error)
   }
@@ -208,7 +204,7 @@ const selectCourse = (course) => {
 
 const updateCourse = async (courseId, updates) => {
   try {
-    const result = await databaseService.updateCourse(courseId, updates)
+    const result = await apiService.updateCourse(courseId, updates)
     if (result.success) {
       // Update local course data
       const courseIndex = courses.value.findIndex(c => c.courseId === courseId)
@@ -250,7 +246,11 @@ const applyToCourse = async (courseId) => {
       experience: 'Beginner level'
     }
     
-    const result = await databaseService.applyToCourse(courseId, applicationData)
+    const result = await apiService.applyToCourse(
+      courseId, 
+      applicationData.motivation, 
+      applicationData.experience
+    )
     if (result.success) {
       saveResult.value = {
         type: 'success',

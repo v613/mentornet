@@ -1,5 +1,5 @@
-// Client-side ABAC service - calls real database
-import { databaseService } from './database.js';
+// Client-side ABAC service - uses API service
+import { apiService } from './api.js';
 
 // Simple user session management (replace with proper auth system)
 let currentUserId = null;
@@ -58,10 +58,10 @@ export const abacService = {
     }
   },
 
-  // Get user with full attributes from database
+  // Get user with full attributes from API
   async getUserWithAttributes(userId) {
     try {
-      const user = await databaseService.getUserWithRoles(userId);
+      const user = await apiService.getUserWithRoles();
       
       if (user) {
         const primaryRole = user.role; // Direct role field from users table
@@ -335,8 +335,8 @@ export const abacService = {
 
   async canUserAccessCourse(courseId) {
     try {
-      // Get course data from database
-      const coursesResult = await databaseService.getCourses(1, 10);
+      // Get course data from API
+      const coursesResult = await apiService.getCourses(1, 10);
       if (coursesResult.success) {
         const course = coursesResult.courses.find(c => c.courseId === courseId);
         if (course) {
@@ -355,8 +355,8 @@ export const abacService = {
 
   async canUserEditCourse(courseId) {
     try {
-      // Get course data from database
-      const coursesResult = await databaseService.getCourses(1, 10);
+      // Get course data from API
+      const coursesResult = await apiService.getCourses(1, 10);
       if (coursesResult.success) {
         const course = coursesResult.courses.find(c => c.courseId === courseId);
         if (course) {

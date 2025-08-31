@@ -18,6 +18,7 @@
             :src="mentor.img" 
             :alt="mentor.displayName || mentor.email"
             class="mentor-image"
+            @error="handleImageError($event, mentor)"
           />
           <div v-else class="mentor-placeholder">
             {{ getInitials(mentor.displayName || mentor.email) }}
@@ -43,7 +44,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { databaseService } from '../services/database.js'
+import { apiService } from '../services/api.js'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -61,12 +62,8 @@ const loadMentors = async () => {
   error.value = null
   
   try {
-    const result = await databaseService.getMentors()
-    if (result.success) {
-      mentors.value = result.mentors
-    } else {
-      error.value = result.error || 'Failed to load mentors'
-    }
+    const mentors_data = await apiService.getMentors()
+    mentors.value = mentors_data || []
   } catch (err) {
     error.value = 'Failed to load mentors'
   } finally {
@@ -83,6 +80,11 @@ const getInitials = (name) => {
     return (words[0][0] + words[1][0]).toUpperCase()
   }
   return name.substring(0, 2).toUpperCase()
+}
+
+const handleImageError = (event, mentor) => {
+  mentor.img = null
+  event.target.style.display = 'none'
 }
 </script>
 

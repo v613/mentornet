@@ -67,7 +67,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { databaseService } from '../services/database.js'
+import { apiService } from '../services/api.js'
 import { tokenService } from '../services/tokenService.js'
 import LanguageSwitcher from './LanguageSwitcher.vue'
 
@@ -92,11 +92,10 @@ const handleSubmit = async () => {
   
   try {
     if (isLogin.value) {
-      // Database authentication for login with i18n
-      const result = await databaseService.authenticateUser(
+      // API authentication for login
+      const result = await apiService.authenticateUser(
         username.value, // Use username as userid
-        password.value,
-        t // Pass translation function
+        password.value
       )
       
       if (result.success) {
@@ -118,15 +117,14 @@ const handleSubmit = async () => {
         
         emit('auth-success', authUser)
       } else {
-        error.value = result.error
+        error.value = t ? t('auth.errors.invalidCredentials') : 'Invalid credentials'
       }
     } else {
-      // Database registration for signup with i18n
-      const result = await databaseService.registerUser(
+      // API registration for signup
+      const result = await apiService.registerUser(
         username.value,
         email.value,
-        password.value,
-        t // Pass translation function
+        password.value
       )
       
       if (result.success) {
@@ -149,7 +147,13 @@ const handleSubmit = async () => {
         
         emit('auth-success', authUser)
       } else {
-        error.value = result.error
+        const errorMap = {
+          'EMAIL_EXISTS': 'auth.errors.emailExists',
+          'USERNAME_EXISTS': 'auth.errors.userExists',
+          'VALIDATION_ERROR': 'auth.errors.registrationFailed'
+        }
+        const errorCode = errorMap[result.errorCode] || 'auth.errors.registrationFailed'
+        error.value = t ? t(errorCode) : result.error
       }
     }
   } catch (err) {

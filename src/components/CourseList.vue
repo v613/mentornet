@@ -157,7 +157,7 @@
 <script setup>
 import { defineEmits, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { databaseService } from '../services/database'
+import { apiService } from '../services/api.js'
 
 const { t } = useI18n()
 
@@ -184,9 +184,11 @@ const currentUser = ref(null)
 
 onMounted(async () => {
   try {
-    const userId = databaseService.getCurrentUserId()
-    if (userId) {
-      currentUser.value = { uid: userId }
+    if (apiService.isAuthenticated()) {
+      const user = apiService.getCurrentUserFromToken()
+      if (user) {
+        currentUser.value = { uid: user.userId || user.id }
+      }
     }
   } catch (error) {
     console.error('Error getting current user:', error)
