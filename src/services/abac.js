@@ -221,7 +221,7 @@ export const abacService = {
   canCreateCourse(subject) {
     return (subject.role === 'mentor' || subject.role === 'admin') &&
            subject.attributes.canCreateCourses &&
-           subject.currentLoad < subject.attributes.mentoringCapacity;
+           subject.currentLoad <= subject.attributes.mentoringCapacity;
   },
 
   canCreateSession(subject, resource, environment) {

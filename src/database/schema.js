@@ -36,7 +36,16 @@ export const courses = pgTable('courses', {
   mentorId: uuid('mentor_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
-  scheduledTime: timestamp('scheduled_time', { withTimezone: true }),
+  category: varchar('category', { length: 100 }),
+  level: varchar('level', { length: 50 }),
+  duration: integer('duration').default(8),
+  maxEnrollment: integer('max_enrollment').default(20),
+  objectives: text('objectives'),
+  prerequisites: text('prerequisites'),
+  skills: text('skills'),
+  settings: text('settings'),
+  status: varchar('status', { length: 20 }).default('draft'),
+  timeSlots: text('time_slots'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -45,6 +54,9 @@ export const subscriptions = pgTable('subscriptions', {
   subscriptionId: serial('subscription_id').primaryKey(),
   menteeId: uuid('mentee_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   courseId: integer('course_id').references(() => courses.courseId, { onDelete: 'cascade' }).notNull(),
+  status: varchar('status', { length: 20 }).default('pending'),
+  motivation: text('motivation'),
+  experience: text('experience'),
   subscribedAt: timestamp('subscribed_at', { withTimezone: true }).defaultNow(),
 });
 

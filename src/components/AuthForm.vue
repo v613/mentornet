@@ -110,12 +110,11 @@ const handleSubmit = async () => {
           isBlocked: result.user.isBlocked
         }
         
-        // Generate and store JWT token asynchronously
-        tokenService.generateToken(result.user).then(token => {
-          if (token) {
-            tokenService.storeToken(token)
-          }
-        })
+        // Generate and store JWT token synchronously
+        const token = await tokenService.generateToken(result.user)
+        if (token) {
+          tokenService.storeToken(token)
+        }
         
         emit('auth-success', authUser)
       } else {
@@ -142,12 +141,11 @@ const handleSubmit = async () => {
           isBlocked: result.user.isBlocked
         }
         
-        // Generate and store JWT token asynchronously
-        tokenService.generateToken(result.user).then(token => {
-          if (token) {
-            tokenService.storeToken(token)
-          }
-        })
+        // Generate and store JWT token synchronously
+        const token = await tokenService.generateToken(result.user)
+        if (token) {
+          tokenService.storeToken(token)
+        }
         
         emit('auth-success', authUser)
       } else {

@@ -11,7 +11,7 @@
     <div v-else class="courses-grid">
       <div 
         v-for="course in courses" 
-        :key="course.id"
+        :key="course.courseId"
         class="course-card"
         @click="$emit('select-course', course)"
       >
@@ -61,7 +61,7 @@
         
         <div class="course-actions">
           <!-- Actions for course creators -->
-          <template v-if="currentTab === 'my-courses'">
+          <template v-if="currentTab === 'my-courses' && canManageCourse(course)">
             <button 
               @click.stop="publishCourse(course)"
               v-if="course.status === 'draft'"
@@ -93,6 +93,16 @@
             </button>
           </template>
           
+          <!-- View-only actions for enrolled courses (mentees) -->
+          <template v-else-if="currentTab === 'my-courses' && !canManageCourse(course)">
+            <button 
+              @click.stop="viewDetails(course)"
+              class="action-btn details"
+            >
+              {{ t('courses.actions.viewDetails') }}
+            </button>
+          </template>
+          
           <!-- Actions for available courses -->
           <template v-else-if="currentTab === 'available'">
             <button 
@@ -112,7 +122,7 @@
           </template>
           
           <!-- Actions for admin view -->
-          <template v-else-if="currentTab === 'all-courses'">
+          <template v-else-if="currentTab === 'all-courses' && userRole === 'admin'">
             <button 
               @click.stop="moderateCourse(course)"
               v-if="course.status === 'published'"
@@ -128,6 +138,16 @@
               {{ t('courses.actions.details') }}
             </button>
           </template>
+          
+          <!-- View-only actions for non-admin users in all-courses tab -->
+          <template v-else-if="currentTab === 'all-courses' && userRole !== 'admin'">
+            <button 
+              @click.stop="viewDetails(course)"
+              class="action-btn details"
+            >
+              {{ t('courses.actions.viewDetails') }}
+            </button>
+          </template>
         </div>
       </div>
     </div>
@@ -135,8 +155,9 @@
 </template>
 
 <script setup>
-import { defineEmits } from 'vue'
+import { defineEmits, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { databaseService } from '../services/database'
 
 const { t } = useI18n()
 
@@ -152,8 +173,34 @@ const props = defineProps({
   currentTab: {
     type: String,
     default: 'available'
+  },
+  userRole: {
+    type: String,
+    default: 'mentee'
   }
 })
+
+const currentUser = ref(null)
+
+onMounted(async () => {
+  try {
+    const userId = databaseService.getCurrentUserId()
+    if (userId) {
+      currentUser.value = { uid: userId }
+    }
+  } catch (error) {
+    console.error('Error getting current user:', error)
+  }
+})
+
+const isOwner = (course) => {
+  if (!currentUser.value || !course.mentorId) return false
+  return currentUser.value.uid === course.mentorId
+}
+
+const canManageCourse = (course) => {
+  return isOwner(course) || props.userRole === 'admin'
+}
 
 const emit = defineEmits(['select-course', 'update-course', 'apply-to-course'])
 
@@ -185,7 +232,7 @@ const formatDate = (timestamp) => {
   
   try {
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
-    return date.toLocaleDateString()
+    return date.toLocaleDateString('ro-RO')
   } catch (error) {
     return t('common.invalidDate')
   }
@@ -194,18 +241,18 @@ const formatDate = (timestamp) => {
 // Course action handlers
 const publishCourse = (course) => {
   if (confirm(t('courses.confirmPublish'))) {
-    emit('update-course', course.id, { status: 'published' })
+    emit('update-course', course.courseId, { status: 'published' })
   }
 }
 
 const archiveCourse = (course) => {
   if (confirm(t('courses.confirmArchive'))) {
-    emit('update-course', course.id, { status: 'archived' })
+    emit('update-course', course.courseId, { status: 'archived' })
   }
 }
 
 const editCourse = (course) => {
-  emit('select-course', course)
+  emit('select-course', { ...course, isEdit: true })
 }
 
 const viewApplications = (course) => {
@@ -214,7 +261,7 @@ const viewApplications = (course) => {
 }
 
 const applyToCourse = (course) => {
-  emit('apply-to-course', course.id)
+  emit('apply-to-course', course.courseId)
 }
 
 const viewDetails = (course) => {
@@ -225,7 +272,7 @@ const moderateCourse = (course) => {
   // Admin moderation actions
   const action = confirm(t('courses.confirmSuspend')) ? 'suspended' : null
   if (action) {
-    emit('update-course', course.id, { status: action })
+    emit('update-course', course.courseId, { status: action })
   }
 }
 </script>

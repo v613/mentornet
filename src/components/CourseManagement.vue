@@ -17,7 +17,7 @@
         :class="{ active: activeTab === 'my-courses' }"
         class="tab-btn"
       >
-        {{ $t('courses.myCourses') }}
+        {{ userRole === 'mentor' ? $t('courses.myCourses') : $t('courses.myEnrolledCourses') }}
       </button>
       <button 
         @click="activeTab = 'available'" 
@@ -41,6 +41,7 @@
         :courses="filteredCourses" 
         :loading="loading"
         :current-tab="activeTab"
+        :user-role="userRole"
         @select-course="selectCourse"
         @update-course="updateCourse"
         @apply-to-course="applyToCourse"
@@ -53,13 +54,28 @@
       @course-created="handleCourseCreated"
     />
 
+    <CreateCourse 
+      v-if="showEditCourse"
+      :edit-mode="true"
+      :course-data="editingCourse"
+      @close="showEditCourse = false; editingCourse = null"
+      @course-updated="handleCourseUpdated"
+    />
+
     <CourseDetails 
       v-if="selectedCourse"
       :course="selectedCourse"
       :user-role="userRole"
       @close="selectedCourse = null"
       @update-course="updateCourse"
+      @edit-course="handleEditCourse"
+      @refresh-course-data="handleRefreshCourseData"
     />
+    
+    <!-- Save Result -->
+    <div v-if="saveResult" class="result-message" :class="saveResult.type">
+      <p>{{ saveResult.message }}</p>
+    </div>
   </div>
 </template>
 
@@ -68,7 +84,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { databaseService } from '../services/database'
 import { abacService } from '../services/abac'
-// import { authService } from '../services/auth' // Removed - no auth service
+import { tokenService } from '../services/tokenService'
 import CourseList from './CourseList.vue'
 import CourseDetails from './CourseDetails.vue'
 import CreateCourse from './CreateCourse.vue'
@@ -79,21 +95,27 @@ const courses = ref([])
 const loading = ref(true)
 const activeTab = ref('available')
 const showCreateCourse = ref(false)
+const showEditCourse = ref(false)
 const selectedCourse = ref(null)
+const editingCourse = ref(null)
 const userRole = ref('mentee')
 const currentUser = ref(null)
 const canCreateCourse = ref(false)
 const isAdmin = ref(false)
+const enrolledCourses = ref([])
+const saveResult = ref(null)
 
 const filteredCourses = computed(() => {
   const userId = currentUser.value?.uid
   
   switch (activeTab.value) {
     case 'my-courses':
-      return courses.value.filter(course => course.creatorId === userId)
+      return userRole.value === 'mentor' 
+        ? courses.value.filter(course => course.mentorId === userId)
+        : enrolledCourses.value
     case 'available':
       return courses.value.filter(course => 
-        course.status === 'published' && course.creatorId !== userId
+        course.status === 'published' && course.mentorId !== userId
       )
     case 'all-courses':
       return courses.value
@@ -104,12 +126,35 @@ const filteredCourses = computed(() => {
 
 onMounted(async () => {
   try {
-    currentUser.value = { uid: 'demo-user', email: 'user@example.com' } // Mock user
-    if (!currentUser.value) return
-
-    userRole.value = await abacService.getUserRole()
-    canCreateCourse.value = await abacService.canUserCreateCourse()
-    isAdmin.value = await abacService.canUserManageUsers()
+    // Get current logged user from token
+    const user = await tokenService.getCurrentUser()
+    
+    if (!user) {
+      console.warn('No authenticated user found')
+      // Check if there's user data in localStorage as fallback
+      const userData = localStorage.getItem('userData')
+      if (userData) {
+        const parsedUser = JSON.parse(userData)
+        currentUser.value = { uid: parsedUser.id, email: parsedUser.email, role: parsedUser.role }
+        userRole.value = parsedUser.role
+        canCreateCourse.value = parsedUser.role === 'mentor' || parsedUser.role === 'admin'
+        isAdmin.value = parsedUser.role === 'admin'
+        abacService.setCurrentUser(currentUser.value.uid)
+      } else {
+        // No authentication available, but still load courses for viewing
+        await loadCourses()
+        return
+      }
+    } else {
+      currentUser.value = { uid: user.id, email: user.email, role: user.role }
+      // Set current user in ABAC service for session management
+      abacService.setCurrentUser(currentUser.value.uid)
+      
+      // Set role directly from token and check permissions
+      userRole.value = user.role
+      canCreateCourse.value = user.role === 'mentor' || user.role === 'admin'
+      isAdmin.value = user.role === 'admin'
+    }
 
     // Set initial tab based on role
     if (userRole.value === 'mentor') {
@@ -117,6 +162,11 @@ onMounted(async () => {
     }
 
     await loadCourses()
+    
+    // Load enrolled courses for mentees
+    if (userRole.value === 'mentee' && currentUser.value?.uid) {
+      await loadEnrolledCourses()
+    }
   } catch (error) {
     console.error('Error initializing course management:', error)
   } finally {
@@ -126,14 +176,6 @@ onMounted(async () => {
 
 const loadCourses = async () => {
   try {
-    let filters = {}
-    
-    if (activeTab.value === 'my-courses') {
-      filters.creatorId = currentUser.value?.uid
-    } else if (activeTab.value === 'available') {
-      filters.status = 'published'
-    }
-
     const result = await databaseService.getCourses(1, 10)
     if (result.success) {
       courses.value = result.courses
@@ -143,8 +185,25 @@ const loadCourses = async () => {
   }
 }
 
+const loadEnrolledCourses = async () => {
+  try {
+    const result = await databaseService.getMenteeEnrolledCourses(currentUser.value.uid)
+    if (result.success) {
+      enrolledCourses.value = result.courses
+    }
+  } catch (error) {
+    console.error('Error loading enrolled courses:', error)
+  }
+}
+
 const selectCourse = (course) => {
-  selectedCourse.value = course
+  if (course.isEdit) {
+    console.log('Opening edit modal for course:', course)
+    editingCourse.value = { ...course, isEdit: undefined }
+    showEditCourse.value = true
+  } else {
+    selectedCourse.value = course
+  }
 }
 
 const updateCourse = async (courseId, updates) => {
@@ -152,14 +211,35 @@ const updateCourse = async (courseId, updates) => {
     const result = await databaseService.updateCourse(courseId, updates)
     if (result.success) {
       // Update local course data
-      const courseIndex = courses.value.findIndex(c => c.id === courseId)
+      const courseIndex = courses.value.findIndex(c => c.courseId === courseId)
       if (courseIndex !== -1) {
-        courses.value[courseIndex] = { ...courses.value[courseIndex], ...updates }
+        courses.value[courseIndex] = { ...courses.value[courseIndex], ...result.course }
+      }
+      // If currently viewing this course, update the selected course
+      if (selectedCourse.value && selectedCourse.value.courseId === courseId) {
+        selectedCourse.value = { ...selectedCourse.value, ...result.course }
+      }
+      saveResult.value = {
+        type: 'success',
+        message: t('courses.messages.updateSuccess')
+      }
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        saveResult.value = null
+      }, 3000)
+    } else {
+      saveResult.value = {
+        type: 'error',
+        message: t('courses.messages.updateError') + ': ' + t(result.error)
       }
     }
   } catch (error) {
     console.error('Error updating course:', error)
-    alert(t('courses.errorUpdating') + ': ' + error.message)
+    saveResult.value = {
+      type: 'error',
+      message: t('courses.messages.updateError') + ': ' + error.message
+    }
   }
 }
 
@@ -172,20 +252,61 @@ const applyToCourse = async (courseId) => {
     
     const result = await databaseService.applyToCourse(courseId, applicationData)
     if (result.success) {
-      alert(t('courses.applicationSubmitted'))
+      saveResult.value = {
+        type: 'success',
+        message: t('courses.applicationSubmitted')
+      }
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        saveResult.value = null
+      }, 3000)
     } else {
-      alert(t('courses.errorApplying') + ': ' + result.error)
+      saveResult.value = {
+        type: 'error',
+        message: t(result.error)
+      }
     }
   } catch (error) {
     console.error('Error applying to course:', error)
-    alert(t('courses.errorApplying') + ': ' + error.message)
+    saveResult.value = {
+      type: 'error',
+      message: t('courses.errorApplying') + ': ' + error.message
+    }
   }
 }
 
 const handleCourseCreated = async (newCourse) => {
   showCreateCourse.value = false
   courses.value.unshift(newCourse)
-  activeTab.value = 'my-courses' // Switch to my courses tab
+  activeTab.value = 'my-courses'
+}
+
+const handleCourseUpdated = async (updatedCourse) => {
+  showEditCourse.value = false
+  editingCourse.value = null
+  
+  const courseIndex = courses.value.findIndex(c => c.courseId === updatedCourse.courseId)
+  if (courseIndex !== -1) {
+    courses.value[courseIndex] = updatedCourse
+  }
+  
+  if (selectedCourse.value && selectedCourse.value.courseId === updatedCourse.courseId) {
+    selectedCourse.value = updatedCourse
+  }
+}
+
+const handleEditCourse = (course) => {
+  selectedCourse.value = null
+  editingCourse.value = course
+  showEditCourse.value = true
+}
+
+const handleRefreshCourseData = async () => {
+  await loadCourses()
+  if (userRole.value === 'mentee' && currentUser.value?.uid) {
+    await loadEnrolledCourses()
+  }
 }
 
 // Watch for tab changes to reload courses
@@ -269,6 +390,25 @@ onMounted(() => {
 
 .course-content {
   min-height: 400px;
+}
+
+.result-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.result-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.result-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 @media (max-width: 768px) {

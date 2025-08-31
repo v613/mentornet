@@ -57,6 +57,43 @@
         <!-- Profile Details -->
         <div class="form-section">
           <h3>{{ $t('profile.profileDetails') }}</h3>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="department">{{ $t('profile.department') }}</label>
+              <input 
+                id="department"
+                type="text" 
+                v-model="profile.attributes.department"
+                class="form-input"
+                placeholder="Engineering, Marketing, etc."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="location">{{ $t('profile.location') }}</label>
+              <input 
+                id="location"
+                type="text" 
+                v-model="profile.attributes.location"
+                class="form-input"
+                placeholder="City, Country"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="experience">{{ $t('profile.experience') }}</label>
+              <input 
+                id="experience"
+                type="number" 
+                v-model.number="profile.attributes.experience"
+                class="form-input"
+                min="0"
+                max="50"
+              />
+            </div>
+          </div>
+
           <div class="form-group">
             <label for="description">{{ $t('profile.description') }}</label>
             <textarea 
@@ -67,6 +104,30 @@
               rows="4"
             ></textarea>
             <small class="form-help">{{ $t('profile.help.descriptionHelp') }}</small>
+          </div>
+
+          <div class="form-group">
+            <label for="skills">{{ $t('profile.skills') }}</label>
+            <textarea 
+              id="skills"
+              v-model="skillsText"
+              class="form-textarea"
+              :placeholder="$t('profile.skillsPlaceholder')"
+              rows="3"
+            ></textarea>
+            <small class="form-help">{{ $t('profile.help.skillsRelevant') }}</small>
+          </div>
+
+          <div class="form-group">
+            <label for="learningGoals">{{ $t('profile.learningGoals') }}</label>
+            <textarea 
+              id="learningGoals"
+              v-model="learningGoalsText"
+              class="form-textarea"
+              :placeholder="$t('profile.learningGoalsPlaceholder')"
+              rows="3"
+            ></textarea>
+            <small class="form-help">{{ $t('profile.help.learningGoalsDescription') }}</small>
           </div>
         </div>
 
