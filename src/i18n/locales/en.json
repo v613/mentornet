@@ -26,14 +26,11 @@
     "errors": {
       "invalidInput": "Invalid input parameters",
       "invalidCredentials": "Invalid credentials",
-      "authenticationFailed": "Authentication failed",
       "allFieldsRequired": "All fields are required",
       "inputTooLong": "Input exceeds maximum length",
       "invalidEmail": "Invalid email format",
       "userExists": "User already exists",
-      "emailExists": "Email already exists", 
-      "userBlocked": "User account is blocked",
-      "registrationFailed": "Registration failed",
+      "emailExists": "Email already exists",
       "userNotFound": "User not found",
       "accessDenied": "Access denied"
     }

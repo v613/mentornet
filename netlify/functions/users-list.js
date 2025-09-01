@@ -1,7 +1,6 @@
 import { executeQuery } from './shared/database.js';
 import { withAuth, hasRole } from './shared/auth.js';
 import { successResponse, errorResponse, corsResponse, serverError } from './shared/response.js';
-import { t } from './shared/i18n.js';
 
 /**
  * User list endpoint (admin only)
@@ -31,7 +30,7 @@ export async function handler(event) {
         },
         body: JSON.stringify({ 
           success: false, 
-          error: t('courses.messages.adminAccessRequired'),
+          error: 'Admin access required',
           errorCode: 'ADMIN_REQUIRED'
         })
       };
@@ -41,7 +40,7 @@ export async function handler(event) {
       case 'GET':
         return handleGetAllUsers(event, user);
       default:
-        return errorResponse(t('courses.messages.methodNotAllowed'), 405);
+        return errorResponse('Method not allowed', 405);
     }
   });
 }
@@ -91,7 +90,7 @@ async function handleGetAllUsers(event, user) {
 
     if (!countResult.success) {
       console.error('Database error counting users:', countResult.error);
-      return serverError(t('courses.messages.failedToFetchUsersCount'));
+      return serverError('Failed to fetch users count');
     }
 
     const totalUsers = parseInt(countResult.data[0].total);
@@ -114,7 +113,7 @@ async function handleGetAllUsers(event, user) {
     
     if (!usersResult.success) {
       console.error('Database error fetching users:', usersResult.error);
-      return serverError(t('courses.messages.failedToFetchUsers'));
+      return serverError('Failed to fetch users');
     }
 
     const users = usersResult.data.map(user => ({
@@ -149,6 +148,6 @@ async function handleGetAllUsers(event, user) {
     
   } catch (error) {
     console.error('Get all users function error:', error);
-    return serverError(t('courses.messages.failedToFetchUsers'));
+    return serverError('Failed to fetch users');
   }
 }

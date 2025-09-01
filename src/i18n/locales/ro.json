@@ -26,14 +26,11 @@
     "errors": {
       "invalidInput": "Parametrii de intrare invalizi",
       "invalidCredentials": "Date de autentificare invalide",
-      "authenticationFailed": "Autentificare eșuată",
       "allFieldsRequired": "Toate câmpurile sunt obligatorii",
       "inputTooLong": "Textul depășește lungimea maximă",
       "invalidEmail": "Format email invalid",
       "userExists": "Utilizatorul există deja",
       "emailExists": "Email-ul există deja",
-      "userBlocked": "Contul utilizatorului este blocat",
-      "registrationFailed": "Înregistrare eșuată",
       "userNotFound": "Utilizator negăsit",
       "accessDenied": "Acces interzis"
     }

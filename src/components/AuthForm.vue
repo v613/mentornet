@@ -103,87 +103,78 @@ const handleSubmit = async () => {
   loading.value = true
   error.value = ''
   
-  try {
-    if (isLogin.value) {
-      // API authentication for login
-      const result = await apiService.authenticateUser(
-        username.value, // Use username as userid
-        password.value
-      )
-      
-      if (result.success) {
-        const authUser = {
-          uid: result.user.id,
-          id: result.user.id,
-          userid: result.user.userid,
-          email: result.user.email,
-          displayName: result.user.displayName,
-          role: result.user.role,
-          isBlocked: result.user.isBlocked
-        }
-        
-        // Generate and store JWT token synchronously
-        const token = await tokenService.generateToken(result.user)
-        if (token) {
-          tokenService.storeToken(token)
-        }
-        
-        emit('auth-success', authUser)
-      } else {
-        // Handle different error types from backend
-        const errorMap = {
-          'USER_BLOCKED': 'auth.accountBlockedMessage',
-          'INVALID_CREDENTIALS': 'auth.errors.invalidCredentials',
-          'USER_NOT_FOUND': 'auth.errors.userNotFound'
-        }
-        const errorKey = errorMap[result.errorCode] || 'auth.errors.invalidCredentials'
-        error.value = t ? t(errorKey) : result.error || 'Authentication failed'
+  if (isLogin.value) {
+    const result = await apiService.authenticateUser(username.value, password.value)
+    if (result.success) {
+      const authUser = {
+        uid: result.user.id,
+        id: result.user.id,
+        userid: result.user.userid,
+        email: result.user.email,
+        displayName: result.user.displayName,
+        role: result.user.role,
+        isBlocked: result.user.isBlocked
       }
+      
+      // Generate and store JWT token synchronously
+      const token = await tokenService.generateToken(result.user)
+      if (token) {
+        tokenService.storeToken(token)
+      }
+      
+      emit('auth-success', authUser)
     } else {
-      // API registration for signup
-      const role = isMentor.value ? 'mentor' : 'mentee'
-      const result = await apiService.registerUser(
-        username.value,
-        email.value,
-        password.value,
-        role
-      )
-      
-      if (result.success) {
-        // Auto-login after successful registration
-        const authUser = {
-          uid: result.user.id,
-          id: result.user.id,
-          userid: result.user.userid,
-          email: result.user.email,
-          displayName: result.user.displayName,
-          role: result.user.role,
-          isBlocked: result.user.isBlocked
-        }
-        
-        // Generate and store JWT token synchronously
-        const token = await tokenService.generateToken(result.user)
-        if (token) {
-          tokenService.storeToken(token)
-        }
-        
-        emit('auth-success', authUser)
-      } else {
-        const errorMap = {
-          'EMAIL_EXISTS': 'auth.errors.emailExists',
-          'USERNAME_EXISTS': 'auth.errors.userExists',
-          'VALIDATION_ERROR': 'auth.errors.registrationFailed'
-        }
-        const errorCode = errorMap[result.errorCode] || 'auth.errors.registrationFailed'
-        error.value = t ? t(errorCode) : result.error
+      // Handle different error types from backend
+      const errorMap = {
+        'USER_BLOCKED': 'auth.accountBlockedMessage',
+        'INVALID_CREDENTIALS': 'auth.errors.invalidCredentials',
+        'USER_NOT_FOUND': 'auth.errors.userNotFound'
       }
+      const errorKey = errorMap[result.errorCode]
+      error.value = errorKey ? t(errorKey) : (result.error || 'Authentication failed')
     }
-  } catch (err) {
-    console.error('Auth error:', err)
-    error.value = t ? t('auth.errors.authenticationFailed') : 'An unexpected error occurred'
-  } finally {
-    loading.value = false
+  } else {
+    // API registration for signup
+    const role = isMentor.value ? 'mentor' : 'mentee'
+    const result = await apiService.registerUser(
+      username.value,
+      email.value,
+      password.value,
+      role
+    )
+    
+    if (result.success) {
+      // Auto-login after successful registration
+      const authUser = {
+        uid: result.user.id,
+        id: result.user.id,
+        userid: result.user.userid,
+        email: result.user.email,
+        displayName: result.user.displayName,
+        role: result.user.role,
+        isBlocked: result.user.isBlocked
+      }
+      
+      // Generate and store JWT token synchronously
+      const token = await tokenService.generateToken(result.user)
+      if (token) {
+        tokenService.storeToken(token)
+      }
+      
+      emit('auth-success', authUser)
+    } else {
+      const errorMap = {
+        'EMAIL_EXISTS': 'auth.errors.emailExists',
+        'USER_EXISTS': 'auth.errors.userExists',
+        'INVALID_EMAIL': 'auth.errors.invalidEmail',
+        'WEAK_PASSWORD': 'courses.messages.weakPassword'
+      }
+      const errorKey = errorMap[result.errorCode]
+      error.value = errorKey ? t(errorKey) : (result.error || 'Registration failed')
+    }
   }
+  
+  loading.value = false
 }
 
 </script>

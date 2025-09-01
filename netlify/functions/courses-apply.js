@@ -2,7 +2,6 @@ import { executeQuery } from './shared/database.js';
 import { withAuth } from './shared/auth.js';
 import { validateRequiredFields } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError, notFoundError } from './shared/response.js';
-import { t } from './shared/i18n.js';
 
 /**
  * Apply to course endpoint
@@ -27,7 +26,7 @@ export async function handler(event) {
       const courseId = event.queryStringParameters?.courseId;
       
       if (!courseId || isNaN(parseInt(courseId))) {
-        return validationError(t('auth.errors.invalidInput'));
+        return validationError('Invalid input parameters');
       }
       
       // Parse request body
@@ -62,30 +61,29 @@ export async function handler(event) {
       `, [parseInt(courseId)]);
       
       if (!courseResult.success) {
-        console.error('Database error checking course:', courseResult.error);
-        return serverError(t('courses.messages.failedToProcessApplication'));
+        return serverError('Failed to process application');
       }
       
       if (courseResult.data.length === 0) {
-        return notFoundError(t('courses.messages.courseNotFound'));
+        return notFoundError('Course not found');
       }
       
       const course = courseResult.data[0];
       
       // Check if course is published and accepting applications
       if (course.status !== 'published') {
-        return errorResponse(t('courses.messages.courseNotAvailable'), 400, 'COURSE_NOT_AVAILABLE');
+        return errorResponse('Course is not available for applications', 400, 'COURSE_NOT_AVAILABLE');
       }
       
       // Check if course is full
       if (course.enrolledCount >= course.maxEnrollment) {
-        return errorResponse(t('courses.actions.full'), 400, 'COURSE_FULL');
+        return errorResponse('Course is full', 400, 'COURSE_FULL');
       }
       
       // Check course settings for self-enrollment
       const settings = course.settings ? JSON.parse(course.settings) : {};
       if (settings.allowSelfEnrollment === false) {
-        return errorResponse(t('courses.messages.applicationsNotAllowed'), 400, 'APPLICATIONS_NOT_ALLOWED');
+        return errorResponse('This course does not allow direct applications', 400, 'APPLICATIONS_NOT_ALLOWED');
       }
       
       // Check if user has already applied to this course
@@ -96,13 +94,12 @@ export async function handler(event) {
       `, [parseInt(courseId), user.userId]);
       
       if (!existingApplicationResult.success) {
-        console.error('Database error checking existing application:', existingApplicationResult.error);
-        return serverError(t('courses.messages.failedToProcessApplication'));
+        return serverError('Failed to process application');
       }
       
       if (existingApplicationResult.data.length > 0) {
         const existingApp = existingApplicationResult.data[0];
-        return errorResponse(t('courses.messages.alreadyApplied'), 409, 'ALREADY_APPLIED');
+        return errorResponse('You have already applied to this course', 409, 'ALREADY_APPLIED');
       }
       
       // Create application
@@ -113,12 +110,11 @@ export async function handler(event) {
       `, [parseInt(courseId), user.userId, motivation, experience]);
       
       if (!applicationResult.success) {
-        console.error('Database error creating application:', applicationResult.error);
-        return serverError(t('courses.messages.failedToSubmitApplication'));
+        return serverError('Failed to submit application');
       }
       
       if (applicationResult.data.length === 0) {
-        return serverError(t('courses.messages.failedToSubmitApplication'));
+        return serverError('Failed to submit application');
       }
       
       const application = applicationResult.data[0];
@@ -131,18 +127,17 @@ export async function handler(event) {
           courseId: course.courseId,
           title: course.title
         },
-        message: t('courses.applicationSubmitted')
+        message: 'Application submitted successfully!'
       }, 201);
       
     } catch (error) {
-      console.error('Apply to course function error:', error);
       
       // Handle JSON parse errors
       if (error instanceof SyntaxError) {
-        return validationError(t('auth.errors.invalidInput'));
+        return validationError('Invalid input parameters');
       }
       
-      return serverError(t('courses.messages.failedToSubmitApplication'));
+      return serverError('Failed to submit application');
     }
   });
 }

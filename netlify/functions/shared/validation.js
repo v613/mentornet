@@ -36,9 +36,8 @@ export function validatePassword(password) {
  */
 export function validateRequiredFields(body, requiredFields) {
   const missing = [];
-  
   for (const field of requiredFields) {
-    if (!body[field] && body[field] !== 0) {
+    if (!(field in body)) {
       missing.push(field);
     }
   }

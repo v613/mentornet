@@ -319,7 +319,7 @@ const updateCourse = async (courseId, updates) => {
     } else {
       saveResult.value = {
         type: 'error',
-        message: t('courses.messages.updateError') + ': ' + t(result.error)
+        message: t('courses.messages.updateError') + ': ' + (result.error || 'Unknown error')
       }
     }
   } catch (error) {
@@ -354,9 +354,17 @@ const applyToCourse = async (courseId) => {
         saveResult.value = null
       }, 3000)
     } else {
+      // Handle different error types from backend
+      const errorMap = {
+        'ALREADY_APPLIED': 'courses.messages.alreadyApplied',
+        'COURSE_FULL': 'courses.actions.full',
+        'COURSE_NOT_AVAILABLE': 'courses.messages.courseNotAvailable',
+        'APPLICATIONS_NOT_ALLOWED': 'courses.messages.applicationsNotAllowed'
+      }
+      const errorKey = errorMap[result.errorCode]
       saveResult.value = {
         type: 'error',
-        message: t(result.error)
+        message: errorKey ? t(errorKey) : (result.error || t('courses.errorApplying'))
       }
     }
   } catch (error) {

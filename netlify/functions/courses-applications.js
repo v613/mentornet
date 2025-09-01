@@ -4,8 +4,8 @@ import { successResponse, errorResponse, corsResponse, validationError, serverEr
 
 /**
  * Course applications management endpoint
- * GET /api/courses/:courseId/applications - Get applications for a course
- * PUT /api/courses/:courseId/applications/:applicationId - Update application status
+ * GET /api/courses-applications?courseId=:courseId - Get applications for a course
+ * PUT /api/courses-applications?courseId=:courseId&applicationId=:applicationId - Update application status
  */
 export async function handler(event) {
   // Handle CORS preflight
@@ -32,10 +32,8 @@ export async function handler(event) {
  */
 async function handleGetApplications(event, user) {
   try {
-    // Extract course ID from path
-    const pathSegments = event.path.split('/');
-    const courseIdIndex = pathSegments.findIndex(segment => segment === 'courses') + 1;
-    const courseId = pathSegments[courseIdIndex];
+    // Extract course ID from query parameters
+    const courseId = event.queryStringParameters?.courseId;
     
     if (!courseId || isNaN(parseInt(courseId))) {
       return validationError('Invalid course ID');
@@ -106,11 +104,9 @@ async function handleGetApplications(event, user) {
  */
 async function handleUpdateApplication(event, user) {
   try {
-    // Extract course ID and application ID from path
-    const pathSegments = event.path.split('/');
-    const courseIdIndex = pathSegments.findIndex(segment => segment === 'courses') + 1;
-    const courseId = pathSegments[courseIdIndex];
-    const applicationId = pathSegments[pathSegments.length - 1];
+    // Extract course ID and application ID from query parameters
+    const courseId = event.queryStringParameters?.courseId;
+    const applicationId = event.queryStringParameters?.applicationId;
     
     if (!courseId || isNaN(parseInt(courseId))) {
       return validationError('Invalid course ID');

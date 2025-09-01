@@ -2,7 +2,6 @@ import { executeQuery } from './shared/database.js';
 import { withAuth, hasRole } from './shared/auth.js';
 import { validateRequiredFields, isValidIntegerId } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError, notFoundError } from './shared/response.js';
-import { t } from './shared/i18n.js';
 
 /**
  * User block/unblock endpoint (admin only)
@@ -26,7 +25,7 @@ export async function handler(event) {
         },
         body: JSON.stringify({ 
           success: false, 
-          error: t('courses.messages.adminAccessRequired'),
+          error: 'Admin access required',
           errorCode: 'ADMIN_REQUIRED'
         })
       };
@@ -36,7 +35,7 @@ export async function handler(event) {
       case 'PUT':
         return handleBlockUser(event, user);
       default:
-        return errorResponse(t('courses.messages.methodNotAllowed'), 405);
+        return errorResponse('Method not allowed', 405);
     }
   });
 }
@@ -48,40 +47,21 @@ async function handleBlockUser(event, user) {
   try {
     // Parse request body
     const body = JSON.parse(event.body || '{}');
-    
-    // Validate required fields
-    const requiredFields = ['userId', 'blocked'];
-    const validation = validateRequiredFields(body, requiredFields);
+
+    const validation = validateRequiredFields(body, ['userId', 'blocked']);
     if (!validation.valid) {
-      return validationError(t('auth.errors.allFieldsRequired'));
-    }
-
-    const { userId, blocked } = body;
-
-    // Validate userId is a valid integer ID
-    if (!isValidIntegerId(userId)) {
-      return validationError(t('courses.messages.invalidUserIdFormat'));
+      return validationError('All fields are required', validation.missingFields);
     }
     
-    // Convert userId to integer for database query
-    const userIdInt = parseInt(userId, 10);
-    
-    // Debug logging
-    console.log('Block user request:', {
-      originalUserId: userId,
-      convertedUserId: userIdInt,
-      blocked: blocked,
-      requestingUser: user.userId
-    });
-
-    // Validate blocked is a boolean
+    const { userId: id, blocked } = body;
     if (typeof blocked !== 'boolean') {
-      return validationError(t('courses.messages.blockedFieldMustBeBoolean'));
+      return validationError('Blocked field must be boolean');
     }
 
     // Prevent admin from blocking themselves
-    if (userIdInt === user.userId) {
-      return validationError(t('courses.messages.cannotBlockYourself'));
+    if (id === user.id) {
+      console.log("id:",id,"user.id:",user.id);
+      return validationError('Cannot block yourself');
     }
 
     // Check if target user exists
@@ -90,26 +70,26 @@ async function handleBlockUser(event, user) {
       FROM users 
       WHERE id = $1
       LIMIT 1
-    `, [userIdInt]);
+    `, [id]);
     
     if (!userExistsResult.success) {
       console.error('Database error checking user existence:', {
         error: userExistsResult.error,
-        userId: userIdInt,
+        userId: id,
         code: userExistsResult.code
       });
-      return serverError(t('courses.messages.failedToCheckUser'));
+      return serverError('Failed to check user');
     }
     
     if (userExistsResult.data.length === 0) {
-      return notFoundError(t('auth.errors.userNotFound'));
+      return notFoundError('User not found');
     }
 
     const targetUser = userExistsResult.data[0];
 
     // Prevent blocking other admins
     if (targetUser.role === 'admin') {
-      return validationError(t('courses.messages.cannotBlockAdmin'));
+      return validationError('Cannot block admin');
     }
 
     // Update user's blocked status
@@ -118,41 +98,38 @@ async function handleBlockUser(event, user) {
       SET is_blocked = $1
       WHERE id = $2
       RETURNING id, userid, is_blocked as "isBlocked"
-    `, [blocked, userIdInt]);
+    `, [blocked, id]);
     
     if (!updateResult.success) {
       console.error('Database error updating user block status:', {
         error: updateResult.error,
-        userId: userIdInt,
+        userId: id,
         blocked: blocked,
         code: updateResult.code
       });
-      return serverError(t('courses.messages.failedToUpdateUserStatus'));
+      return serverError('Failed to update user status');
     }
     
     if (updateResult.data.length === 0) {
-      return notFoundError(t('auth.errors.userNotFound'));
+      return notFoundError('User not found');
     }
     
-    const updatedUser = updateResult.data[0];
-    
     return successResponse({
-      message: blocked ? t('courses.messages.userBlockedSuccessfully') : t('courses.messages.userUnblockedSuccessfully'),
+      message: blocked ? 'User blocked successfully' : 'User unblocked successfully',
       user: {
-        id: updatedUser.id,
-        userid: updatedUser.userid,
-        isBlocked: updatedUser.isBlocked
+        id: updateResult.data[0].id,
+        userid: updateResult.data[0].userid,
+        isBlocked: updateResult.data[0].isBlocked
       }
     });
     
   } catch (error) {
     console.error('Block user function error:', error);
     
-    // Handle JSON parse errors
     if (error instanceof SyntaxError) {
-      return validationError(t('auth.errors.invalidInput'));
+      return validationError('Invalid input parameters');
     }
     
-    return serverError(t('courses.messages.failedToUpdateUserStatus'));
+    return serverError('Failed to update user status');
   }
 }

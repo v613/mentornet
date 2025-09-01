@@ -1,7 +1,6 @@
 import { executeQuery } from './shared/database.js';
 import { validateRequiredFields, isValidEmail, validatePassword } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError } from './shared/response.js';
-import { t } from './shared/i18n.js';
 
 /**
  * User registration endpoint
@@ -17,7 +16,7 @@ export async function handler(event) {
   
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
-    return errorResponse(t('courses.messages.methodNotAllowed'), 405);
+    return errorResponse('Method not allowed', 405);
   }
   
   try {
@@ -34,13 +33,13 @@ export async function handler(event) {
     
     // Validate email format
     if (!isValidEmail(email)) {
-      return validationError(t('auth.errors.invalidEmail'), null, 'INVALID_EMAIL');
+      return validationError('Invalid email format', null, 'INVALID_EMAIL');
     }
     
     // Validate password strength
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
-      return validationError(t('courses.messages.weakPassword'), null, 'WEAK_PASSWORD');
+      return validationError('Password does not meet security requirements', null, 'WEAK_PASSWORD');
     }
     
     // Check if user already exists
@@ -50,17 +49,17 @@ export async function handler(event) {
     
     if (!existingUserResult.success) {
       console.error('Database error checking existing user:', existingUserResult.error);
-      return serverError(t('courses.messages.registrationFailed'));
+      return serverError('Registration failed');
     }
     
     if (existingUserResult.data.length > 0) {
-      return errorResponse(t('courses.messages.userAlreadyExists'), 409, 'USER_EXISTS');
+      return errorResponse('User already exists with this username or email', 409, 'USER_EXISTS');
     }
     
     // Insert new user with encrypted password
     const newUserResult = await executeQuery(`
       INSERT INTO users (userid, email, pwd, role) 
-      VALUES ($1, $2, crypt($3, gen_salt('bf')), 'mentee')
+      VALUES ($1, $2, $3, 'mentee')
       RETURNING id, userid, email, role, display_name as "displayName"
     `, [userid, email, password]);
     
@@ -69,14 +68,14 @@ export async function handler(event) {
       
       // Handle unique constraint violations
       if (newUserResult.code === '23505') {
-        return errorResponse(t('courses.messages.userAlreadyExists'), 409, 'USER_EXISTS');
+        return errorResponse('User already exists with this username or email', 409, 'USER_EXISTS');
       }
       
-      return serverError(t('courses.messages.registrationFailed'));
+      return serverError('Registration failed');
     }
     
     if (newUserResult.data.length === 0) {
-      return serverError(t('courses.messages.failedToCreateUser'));
+      return serverError('Failed to create user');
     }
     
     const newUser = newUserResult.data[0];
@@ -97,7 +96,7 @@ export async function handler(event) {
     
     // Handle JSON parse errors
     if (error instanceof SyntaxError) {
-      return validationError(t('courses.messages.invalidJsonInRequestBody'));
+      return validationError('Invalid JSON in request body');
     }
     
     return serverError('Registration failed');

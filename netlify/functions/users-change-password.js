@@ -60,7 +60,7 @@ export async function handler(event) {
       // Update password with new encrypted password
       const updateResult = await executeQuery(`
         UPDATE users 
-        SET pwd = crypt($2, gen_salt('bf'))
+        SET pwd = $2
         WHERE id = $1 
         RETURNING id
       `, [user.userId, newPassword]);

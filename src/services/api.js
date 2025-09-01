@@ -78,13 +78,25 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || `HTTP ${response.status}`);
+        // Return structured error response instead of throwing
+        return {
+          success: false,
+          error: data.error || `HTTP ${response.status}`,
+          errorCode: data.errorCode || null,
+          status: response.status
+        };
       }
 
       return data;
     } catch (error) {
       console.error(`API request failed: ${endpoint}`, error);
-      throw error;
+      // Return structured error response for network/parsing errors
+      return {
+        success: false,
+        error: error.message || 'Network or parsing error',
+        errorCode: null,
+        status: null
+      };
     }
   }
 
@@ -145,6 +157,7 @@ class ApiService {
   async authenticateUser(userid, password) {
     const response = await this.post('/auth-login', { userid, password });
     
+    // Only set token if authentication was successful
     if (response.success && response.token) {
       this.setToken(response.token);
     }
@@ -363,7 +376,7 @@ class ApiService {
    * @returns {Promise<Object>} Status update result
    */
   async updateApplicationStatus(courseId, applicationId, status) {
-    return this.put(`/courses/${courseId}/applications/${applicationId}`, { status });
+    return this.put(`/courses-applications?courseId=${courseId}&applicationId=${applicationId}`, { status });
   }
 
   /**

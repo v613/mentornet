@@ -26,14 +26,11 @@
     "errors": {
       "invalidInput": "Неверные входные параметры",
       "invalidCredentials": "Неверные учетные данные",
-      "authenticationFailed": "Ошибка аутентификации",
       "allFieldsRequired": "Все поля обязательны",
       "inputTooLong": "Ввод превышает максимальную длину",
       "invalidEmail": "Неверный формат email",
       "userExists": "Пользователь уже существует",
       "emailExists": "Email уже существует",
-      "userBlocked": "Учетная запись пользователя заблокирована",
-      "registrationFailed": "Ошибка регистрации",
       "userNotFound": "Пользователь не найден",
       "accessDenied": "Доступ запрещен"
     }
