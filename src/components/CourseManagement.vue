@@ -45,6 +45,7 @@
         @select-course="selectCourse"
         @update-course="updateCourse"
         @apply-to-course="applyToCourse"
+        @cancel-application="handleCancelApplication"
       />
     </div>
 
@@ -80,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apiService } from '../services/api.js'
 import { abacService } from '../services/abac'
@@ -137,7 +138,7 @@ onMounted(async () => {
         const parsedUser = JSON.parse(userData)
         currentUser.value = { uid: parsedUser.id, email: parsedUser.email, role: parsedUser.role }
         userRole.value = parsedUser.role
-        canCreateCourse.value = parsedUser.role === 'mentor' || parsedUser.role === 'admin'
+        canCreateCourse.value = parsedUser.role === 'mentor'
         isAdmin.value = parsedUser.role === 'admin'
         abacService.setCurrentUser(currentUser.value.uid)
       } else {
@@ -152,7 +153,7 @@ onMounted(async () => {
       
       // Set role directly from token and check permissions
       userRole.value = user.role
-      canCreateCourse.value = user.role === 'mentor' || user.role === 'admin'
+      canCreateCourse.value = user.role === 'mentor'
       isAdmin.value = user.role === 'admin'
     }
 
@@ -174,10 +175,21 @@ onMounted(async () => {
   }
 })
 
+// Watch for tab changes to reload courses
+watch(activeTab, async () => {
+  await loadCourses()
+})
+
 const loadCourses = async () => {
   try {
-    const result = await apiService.getCourses(1, 10)
-    courses.value = result.courses
+    let result
+    if (isAdmin.value && activeTab.value === 'all-courses') {
+      result = await apiService.getAllCoursesForAdmin()
+      courses.value = Array.isArray(result) ? result : result.courses || []
+    } else {
+      result = await apiService.getCourses(1, 10)
+      courses.value = result.courses || []
+    }
   } catch (error) {
     console.error('Error loading courses:', error)
   }
@@ -272,6 +284,32 @@ const applyToCourse = async (courseId) => {
     saveResult.value = {
       type: 'error',
       message: t('courses.errorApplying') + ': ' + error.message
+    }
+  }
+}
+
+const handleCancelApplication = async (courseId) => {
+  try {
+    // Reload enrolled courses to reflect the cancellation
+    if (userRole.value === 'mentee' && currentUser.value?.uid) {
+      await loadEnrolledCourses()
+    }
+    
+    // Show success message
+    saveResult.value = {
+      type: 'success',
+      message: t('courses.applicationCancelled')
+    }
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      saveResult.value = null
+    }, 3000)
+  } catch (error) {
+    console.error('Error handling cancelled application:', error)
+    saveResult.value = {
+      type: 'error',
+      message: t('courses.errorCancelling') + ': ' + error.message
     }
   }
 }

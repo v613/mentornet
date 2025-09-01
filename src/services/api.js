@@ -159,8 +159,8 @@ class ApiService {
    * @param {string} password Password
    * @returns {Promise<Object>} Registration result
    */
-  async registerUser(userid, email, password) {
-    return this.post('/auth-register', { userid, email, password });
+  async registerUser(userid, email, password, role = 'mentee') {
+    return this.post('/auth-register', { userid, email, password, role });
   }
 
   /**
@@ -218,6 +218,79 @@ class ApiService {
   async getMentorCourses() {
     const response = await this.get('/users-my-courses');
     return response.courses || [];
+  }
+
+  // ============================================
+  // ADMIN MANAGEMENT METHODS
+  // ============================================
+
+  /**
+   * Get all users (admin only)
+   * @param {number} page Page number (default: 1)
+   * @param {number} pageSize Page size (default: 20)
+   * @param {string} role Role filter (optional: mentee, mentor, admin)
+   * @param {string} search Search term (optional)
+   * @returns {Promise<Object>} Users with pagination and filter info
+   */
+  async getAllUsers(page = 1, pageSize = 20, role = null, search = null) {
+    const params = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() });
+    if (role) params.append('role', role);
+    if (search && search.trim()) params.append('search', search.trim());
+    
+    const response = await this.get(`/users-list?${params.toString()}`);
+    return {
+      users: response.users || [],
+      pagination: response.pagination || {},
+      filters: response.filters || {}
+    };
+  }
+
+  /**
+   * Block/unblock a user (admin only)
+   * @param {string} userId User ID to block/unblock
+   * @param {boolean} blocked Block status
+   * @returns {Promise<Object>} Update result
+   */
+  async updateUserBlockStatus(userId, blocked) {
+    return this.put('/users-block', { userId, blocked });
+  }
+
+  /**
+   * Update any user's profile (admin only)
+   * @param {string} userId User ID to update
+   * @param {Object} profileData Profile data to update
+   * @returns {Promise<Object>} Update result
+   */
+  async updateAnyUserProfile(userId, profileData) {
+    return this.put(`/users-profile/${userId}`, profileData);
+  }
+
+  /**
+   * Get all courses for admin management
+   * @returns {Promise<Array>} List of all courses
+   */
+  async getAllCoursesForAdmin() {
+    const response = await this.get('/courses-list?all=true');
+    return response.courses || [];
+  }
+
+  /**
+   * Update any course (admin only)
+   * @param {string} courseId Course ID to update
+   * @param {Object} courseData Course data to update
+   * @returns {Promise<Object>} Update result
+   */
+  async updateAnyCourse(courseId, courseData) {
+    return this.put(`/courses-update?courseId=${courseId}`, courseData);
+  }
+
+  /**
+   * Delete any course (admin only)
+   * @param {string} courseId Course ID to delete
+   * @returns {Promise<Object>} Delete result
+   */
+  async deleteAnyCourse(courseId) {
+    return this.delete(`/courses-delete?courseId=${courseId}`);
   }
 
   // ============================================
@@ -291,6 +364,15 @@ class ApiService {
    */
   async updateApplicationStatus(courseId, applicationId, status) {
     return this.put(`/courses/${courseId}/applications/${applicationId}`, { status });
+  }
+
+  /**
+   * Cancel course application (mentee only)
+   * @param {number} courseId Course ID
+   * @returns {Promise<Object>} Cancellation result
+   */
+  async cancelCourseApplication(courseId) {
+    return this.delete(`/courses-cancel-application?courseId=${courseId}`);
   }
 
   // ============================================

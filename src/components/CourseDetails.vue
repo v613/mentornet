@@ -578,6 +578,7 @@ const formatTimeSlot = (slot) => {
 .status.approved { background-color: #e8f5e8; color: #388e3c; }
 .status.rejected { background-color: #ffebee; color: #d32f2f; }
 .status.pending { background-color: #fff3e0; color: #f57c00; }
+.status.cancelled { background-color: #ffebee; color: #d32f2f; }
 
 .close-btn {
   background: none;

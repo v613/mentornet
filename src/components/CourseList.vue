@@ -101,6 +101,21 @@
             >
               {{ t('courses.actions.viewDetails') }}
             </button>
+            
+            <button 
+              v-if="canCancelCourse(course)"
+              @click.stop="cancelCourseApplication(course)"
+              class="action-btn cancel"
+            >
+              {{ t('courses.actions.cancel') }}
+            </button>
+            
+            <span 
+              v-if="course.status === 'cancelled'"
+              class="cancelled-status"
+            >
+              {{ t('courses.status.cancelled') }}
+            </span>
           </template>
           
           <!-- Actions for available courses -->
@@ -124,11 +139,10 @@
           <!-- Actions for admin view -->
           <template v-else-if="currentTab === 'all-courses' && userRole === 'admin'">
             <button 
-              @click.stop="moderateCourse(course)"
-              v-if="course.status === 'published'"
-              class="action-btn moderate"
+              @click.stop="editCourse(course)"
+              class="action-btn edit"
             >
-              {{ t('courses.actions.moderate') }}
+              {{ t('courses.actions.edit') }}
             </button>
             
             <button 
@@ -204,7 +218,42 @@ const canManageCourse = (course) => {
   return isOwner(course) || props.userRole === 'admin'
 }
 
-const emit = defineEmits(['select-course', 'update-course', 'apply-to-course'])
+const canCancelCourse = (course) => {
+  if (!course || course.status === 'cancelled') return false
+  
+  // Check if it's an upcoming course
+  const now = new Date()
+  
+  // Check if course has time slots with future sessions
+  if (course.timeSlots && course.timeSlots.length > 0) {
+    const hasUpcomingSessions = course.timeSlots.some(slot => {
+      if (slot.startTime) {
+        // Parse the time slot date/time
+        const sessionDate = new Date(slot.startTime)
+        const timeDiff = sessionDate.getTime() - now.getTime()
+        const hoursUntilSession = timeDiff / (1000 * 60 * 60)
+        
+        // Allow cancellation if session is more than 24 hours away
+        return hoursUntilSession > 24
+      }
+      return false
+    })
+    return hasUpcomingSessions
+  }
+  
+  // For courses without specific time slots, check if course end date is in future
+  if (course.endDate) {
+    const courseEndDate = new Date(course.endDate)
+    const timeDiff = courseEndDate.getTime() - now.getTime()
+    const hoursUntilEnd = timeDiff / (1000 * 60 * 60)
+    return hoursUntilEnd > 24
+  }
+  
+  // If no specific timing info, allow cancellation (backend will validate)
+  return true
+}
+
+const emit = defineEmits(['select-course', 'update-course', 'apply-to-course', 'cancel-application'])
 
 const getEmptyMessage = () => {
   switch (props.currentTab) {
@@ -270,11 +319,24 @@ const viewDetails = (course) => {
   emit('select-course', course)
 }
 
-const moderateCourse = (course) => {
-  // Admin moderation actions
-  const action = confirm(t('courses.confirmSuspend')) ? 'suspended' : null
-  if (action) {
-    emit('update-course', course.courseId, { status: action })
+
+const cancelCourseApplication = async (course) => {
+  if (!confirm(t('courses.confirmCancel'))) {
+    return
+  }
+  
+  try {
+    const result = await apiService.cancelCourseApplication(course.courseId)
+    if (result.success) {
+      // Update the course status locally to show as cancelled
+      course.status = 'cancelled'
+      emit('cancel-application', course.courseId)
+    } else {
+      alert(t('courses.cancelError', { error: result.error }))
+    }
+  } catch (error) {
+    console.error('Error cancelling course application:', error)
+    alert(t('courses.cancelError', { error: error.message }))
   }
 }
 </script>
@@ -496,6 +558,33 @@ const moderateCourse = (course) => {
 
 .action-btn.moderate:hover:not(:disabled) {
   background-color: #da190b;
+}
+
+.action-btn.cancel {
+  background-color: #ff5722;
+  color: white;
+}
+
+.action-btn.cancel:hover:not(:disabled) {
+  background-color: #e64a19;
+}
+
+.cancelled-status {
+  padding: 0.5rem 1rem;
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: center;
+  flex: 1;
+  min-width: 80px;
+}
+
+.status.cancelled {
+  background-color: #ffebee;
+  color: #d32f2f;
 }
 
 @media (max-width: 768px) {

@@ -44,6 +44,17 @@
           />
         </div>
         
+        <div class="form-group" v-if="!isLogin">
+          <label class="checkbox-container">
+            <input
+              type="checkbox"
+              v-model="isMentor"
+            />
+            <span class="checkmark"></span>
+            {{ $t('auth.createMentorProfile') }}
+          </label>
+        </div>
+        
         <button type="submit" :disabled="loading">
           {{ loading ? $t('auth.processing') : $t(isLogin ? 'auth.signIn' : 'auth.signUp') }}
         </button>
@@ -78,11 +89,13 @@ const isLogin = ref(true)
 const username = ref('')
 const email = ref('')
 const password = ref('')
+const isMentor = ref(false)
 const loading = ref(false)
 const error = ref('')
 
 const toggleMode = () => {
   isLogin.value = !isLogin.value
+  isMentor.value = false
   error.value = ''
 }
 
@@ -121,10 +134,12 @@ const handleSubmit = async () => {
       }
     } else {
       // API registration for signup
+      const role = isMentor.value ? 'mentor' : 'mentee'
       const result = await apiService.registerUser(
         username.value,
         email.value,
-        password.value
+        password.value,
+        role
       )
       
       if (result.success) {
@@ -302,6 +317,64 @@ button[type="submit"]:disabled {
 
 .link-button:hover {
   color: var(--color-primary-hover);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+}
+
+.checkbox-container input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  height: 18px;
+  width: 18px;
+  background-color: var(--color-input-bg);
+  border: 2px solid var(--color-input-border);
+  border-radius: var(--radius-xs);
+  margin-right: var(--spacing-sm);
+  display: inline-block;
+  position: relative;
+  transition: all var(--transition-base);
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  border-color: var(--color-primary-start);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--color-primary-start);
+  border-color: var(--color-primary-start);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 

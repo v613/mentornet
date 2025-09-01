@@ -185,6 +185,7 @@ npm run build
 - Participate in assigned sessions
 - Leave reviews and feedback
 - View mentor profiles and course details
+- Can be blocked by administrators (restricts all access when blocked)
 
 ### **Mentor**
 - All mentee capabilities +
@@ -192,13 +193,20 @@ npm run build
 - Review and approve/reject course applications
 - Schedule and conduct mentoring sessions
 - Set availability and capacity limits (default: 5 mentees)
+- Can select mentor role during account registration
 
 ### **Admin**
-- All mentor + mentee capabilities +
-- User role management (promote mentee ↔ mentor)
-- Course moderation and oversight
-- System analytics and reporting
-- User account management
+- Full system access with comprehensive management capabilities
+- **User Management**:
+  - View all users in the system with detailed profiles
+  - Edit any user's profile information
+  - Block/unblock mentee accounts
+  - Access dedicated Admin tab in navigation
+- **Course Management**:
+  - View and edit all courses in the system (including other mentors' courses)
+  - Access "All Courses (Admin)" tab for complete course oversight
+  - Full course CRUD operations across all mentors
+- **System Access**: Cannot be blocked (admin accounts are protected)
 
 ## 🔐 Security Features
 
@@ -228,15 +236,6 @@ Multilingual support is available for authentication pages only:
 - **English (EN)**: Additional language
 
 Language files are located in `src/i18n/locales/`. The main application interface uses English for consistency across roles and features.
-
-### Security Checklist
-- ✅ Database credentials secured in Netlify environment variables
-- ✅ JWT secret key configured and secured
-- ✅ HTTP-only cookies enabled with SameSite protection
-- ✅ Client-side database access completely removed
-- ✅ All database operations secured via Netlify Functions
-- ✅ SQL injection protection with prepared statements
-- ✅ API rate limiting and validation implemented
 
 ## 🆘 Support
 

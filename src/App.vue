@@ -4,6 +4,7 @@ import AuthForm from './components/AuthForm.vue'
 import CourseManagement from './components/CourseManagement.vue'
 import UserProfile from './components/UserProfile.vue'
 import MentorsList from './components/MentorsList.vue'
+import AdminUserManagement from './components/AdminUserManagement.vue'
 import { tokenService } from './services/tokenService.js'
 
 const user = ref(null)
@@ -52,6 +53,15 @@ const checkExistingSession = async () => {
   
   <AuthForm v-else-if="!user" @auth-success="handleAuthSuccess" />
   
+  <div v-else-if="user && user.isBlocked && user.role === 'mentee'" class="blocked-user-view">
+    <div class="blocked-message">
+      <div class="blocked-icon">🚫</div>
+      <h2>{{ $t('auth.accountBlocked') }}</h2>
+      <p>{{ $t('auth.accountBlockedMessage') }}</p>
+      <button @click="handleSignOut" class="sign-out-btn">{{ $t('common.signOut') }}</button>
+    </div>
+  </div>
+  
   <div v-else>
     <header>
       <div class="user-info">
@@ -85,18 +95,28 @@ const checkExistingSession = async () => {
             {{ $t('mentors.title') }}
           </button>
           <button 
+            v-if="!isAdminUser"
             @click="activeView = 'profile'"
             :class="{ active: activeView === 'profile' }"
             class="nav-tab"
           >
             {{ $t('profile.title') }}
           </button>
+          <button 
+            v-if="isAdminUser"
+            @click="activeView = 'admin'"
+            :class="{ active: activeView === 'admin' }"
+            class="nav-tab"
+          >
+            {{ $t('admin.title') }}
+          </button>
         </div>
         
         <div class="view-content">
           <CourseManagement v-if="activeView === 'courses'" />
           <MentorsList v-if="activeView === 'mentors'" />
-          <UserProfile v-if="activeView === 'profile'" />
+          <UserProfile v-if="activeView === 'profile' && !isAdminUser" />
+          <AdminUserManagement v-if="activeView === 'admin'" />
         </div>
       </div>
     </main>
@@ -214,6 +234,43 @@ header {
 
 .view-content {
   min-height: 400px;
+}
+
+.blocked-user-view {
+  min-height: 100vh;
+  background: var(--color-primary-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+}
+
+.blocked-message {
+  background: var(--color-bg-primary);
+  padding: var(--spacing-3xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-auth-card);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.blocked-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.blocked-message h2 {
+  color: var(--color-error);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.8rem;
+}
+
+.blocked-message p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2xl);
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 @media (max-width: 768px) {

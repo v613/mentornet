@@ -1,10 +1,11 @@
 import { executeQuery } from './shared/database.js';
 import { validatePagination } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, serverError } from './shared/response.js';
+import { verifyToken, hasRole } from './shared/auth.js';
 
 /**
  * Get courses with pagination
- * GET /api/courses?page=1&pageSize=10
+ * GET /api/courses?page=1&pageSize=10&all=true (admin only)
  */
 export async function handler(event) {
   // Handle CORS preflight
@@ -20,10 +21,42 @@ export async function handler(event) {
   try {
     // Validate and extract pagination parameters
     const { page, pageSize, offset } = validatePagination(event.queryStringParameters || {});
+    const queryParams = event.queryStringParameters || {};
+    const showAllCourses = queryParams.all === 'true';
+    
+    // Check authentication for admin features
+    let user = null;
+    if (showAllCourses) {
+      const authHeader = event.headers.authorization || event.headers.Authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.replace('Bearer ', '');
+        user = await verifyToken(token);
+      }
+      
+      // If requesting all courses but not admin, return error
+      if (!user || !hasRole(user, ['admin'])) {
+        return {
+          statusCode: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ 
+            success: false, 
+            error: 'Admin access required to view all courses',
+            errorCode: 'ADMIN_REQUIRED'
+          })
+        };
+      }
+    }
+    
+    // Build WHERE clause based on access level
+    const whereClause = showAllCourses ? '' : 'WHERE c.status = \'published\'';
+    const countWhereClause = showAllCourses ? '' : 'WHERE status = \'published\'';
     
     // Get total count of courses
     const countResult = await executeQuery(`
-      SELECT COUNT(*) as total FROM courses
+      SELECT COUNT(*) as total FROM courses ${countWhereClause}
     `);
     
     if (!countResult.success) {
@@ -65,6 +98,7 @@ export async function handler(event) {
         FROM subscriptions 
         GROUP BY course_id
       ) s ON c.course_id = s.course_id
+      ${whereClause}
       ORDER BY c.created_at DESC
       LIMIT $1 OFFSET $2
     `, [pageSize, offset]);
