@@ -1,6 +1,7 @@
 import { executeQuery } from './shared/database.js';
 import { withAuth, hasRole } from './shared/auth.js';
 import { successResponse, errorResponse, corsResponse, serverError } from './shared/response.js';
+import { t } from './shared/i18n.js';
 
 /**
  * User list endpoint (admin only)
@@ -30,7 +31,7 @@ export async function handler(event) {
         },
         body: JSON.stringify({ 
           success: false, 
-          error: 'Admin access required',
+          error: t('courses.messages.adminAccessRequired'),
           errorCode: 'ADMIN_REQUIRED'
         })
       };
@@ -40,7 +41,7 @@ export async function handler(event) {
       case 'GET':
         return handleGetAllUsers(event, user);
       default:
-        return errorResponse('Method not allowed', 405);
+        return errorResponse(t('courses.messages.methodNotAllowed'), 405);
     }
   });
 }
@@ -90,7 +91,7 @@ async function handleGetAllUsers(event, user) {
 
     if (!countResult.success) {
       console.error('Database error counting users:', countResult.error);
-      return serverError('Failed to fetch users count');
+      return serverError(t('courses.messages.failedToFetchUsersCount'));
     }
 
     const totalUsers = parseInt(countResult.data[0].total);
@@ -113,7 +114,7 @@ async function handleGetAllUsers(event, user) {
     
     if (!usersResult.success) {
       console.error('Database error fetching users:', usersResult.error);
-      return serverError('Failed to fetch users');
+      return serverError(t('courses.messages.failedToFetchUsers'));
     }
 
     const users = usersResult.data.map(user => ({
@@ -122,7 +123,8 @@ async function handleGetAllUsers(event, user) {
       email: user.email,
       role: user.role,
       displayName: user.displayName,
-      img: user.img,
+      // img: user.img,
+      img: user.img ? Buffer.from(user.img).toString('utf8') : user.img,
       description: user.description,
       isBlocked: user.isBlocked,
       createdAt: user.createdAt
@@ -147,6 +149,6 @@ async function handleGetAllUsers(event, user) {
     
   } catch (error) {
     console.error('Get all users function error:', error);
-    return serverError('Failed to fetch users');
+    return serverError(t('courses.messages.failedToFetchUsers'));
   }
 }

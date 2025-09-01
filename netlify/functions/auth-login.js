@@ -2,6 +2,7 @@ import { executeQuery } from './shared/database.js';
 import { generateToken } from './shared/auth.js';
 import { validateRequiredFields, isValidEmail } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError } from './shared/response.js';
+import { t } from './shared/i18n.js';
 
 /**
  * User authentication endpoint
@@ -17,7 +18,7 @@ export async function handler(event) {
   
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
-    return errorResponse('Method not allowed', 405);
+    return errorResponse(t('courses.messages.methodNotAllowed'), 405);
   }
   
   try {
@@ -42,11 +43,11 @@ export async function handler(event) {
     
     if (!authResult.success) {
       console.error('Database error during authentication:', authResult.error);
-      return serverError('Authentication failed');
+      return serverError(t('courses.messages.authenticationFailed'));
     }
     
     if (authResult.data.length === 0) {
-      return errorResponse('Invalid credentials', 401, 'INVALID_CREDENTIALS');
+      return errorResponse(t('auth.errors.invalidCredentials'), 401, 'INVALID_CREDENTIALS');
     }
     
     // Get user details after successful authentication
@@ -59,18 +60,18 @@ export async function handler(event) {
     
     if (!userResult.success) {
       console.error('Database error fetching user details:', userResult.error);
-      return serverError('Failed to fetch user details');
+      return serverError(t('courses.messages.failedToFetchUserDetails'));
     }
     
     if (userResult.data.length === 0) {
-      return errorResponse('User not found', 404, 'USER_NOT_FOUND');
+      return errorResponse(t('auth.errors.userNotFound'), 404, 'USER_NOT_FOUND');
     }
     
     const user = userResult.data[0];
     
     // Check if user is blocked
     if (user.isBlocked) {
-      return errorResponse('User account is blocked', 403, 'USER_BLOCKED');
+      return errorResponse(t('courses.messages.userAccountBlocked'), 403, 'USER_BLOCKED');
     }
     
     // Generate JWT token
@@ -93,9 +94,9 @@ export async function handler(event) {
     
     // Handle JSON parse errors
     if (error instanceof SyntaxError) {
-      return validationError('Invalid JSON in request body');
+      return validationError(t('courses.messages.invalidJsonInRequestBody'));
     }
     
-    return serverError('Authentication failed');
+    return serverError(t('courses.messages.authenticationFailed'));
   }
 }

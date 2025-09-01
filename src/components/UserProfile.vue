@@ -59,7 +59,7 @@
           <h3>{{ $t('profile.profileDetails') }}</h3>
           
           <div class="form-grid">
-            <div class="form-group">
+            <!-- <div class="form-group">
               <label for="department">{{ $t('profile.department') }}</label>
               <input 
                 id="department"
@@ -68,7 +68,7 @@
                 class="form-input"
                 placeholder="Engineering, Marketing, etc."
               />
-            </div>
+            </div> -->
 
             <div class="form-group">
               <label for="location">{{ $t('profile.location') }}</label>

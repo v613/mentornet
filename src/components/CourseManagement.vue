@@ -47,6 +47,34 @@
         @apply-to-course="applyToCourse"
         @cancel-application="handleCancelApplication"
       />
+      
+      <!-- Pagination Controls -->
+      <div v-if="!loading && pagination.total > pageSize" class="pagination-controls">
+        <button 
+          @click="prevPage" 
+          :disabled="!pagination.hasPrev"
+          class="pagination-btn"
+        >
+          {{ $t('admin.previous') }}
+        </button>
+        
+        <div class="pagination-info">
+          <span>
+            {{ $t('admin.pageInfo', { current: currentPage, total: pagination.totalPages }) }}
+          </span>
+          <span class="total-info">
+            ({{ pagination.total }} {{ $t('courses.total') }})
+          </span>
+        </div>
+        
+        <button 
+          @click="nextPage" 
+          :disabled="!pagination.hasNext"
+          class="pagination-btn"
+        >
+          {{ $t('admin.next') }}
+        </button>
+      </div>
     </div>
 
     <CreateCourse 
@@ -105,6 +133,16 @@ const canCreateCourse = ref(false)
 const isAdmin = ref(false)
 const enrolledCourses = ref([])
 const saveResult = ref(null)
+
+// Pagination state
+const currentPage = ref(1)
+const pageSize = ref(20)
+const pagination = ref({
+  total: 0,
+  totalPages: 0,
+  hasNext: false,
+  hasPrev: false
+})
 
 const filteredCourses = computed(() => {
   const userId = currentUser.value?.uid
@@ -177,6 +215,8 @@ onMounted(async () => {
 
 // Watch for tab changes to reload courses
 watch(activeTab, async () => {
+  // Reset to page 1 when switching tabs
+  currentPage.value = 1
   await loadCourses()
 })
 
@@ -184,14 +224,32 @@ const loadCourses = async () => {
   try {
     let result
     if (isAdmin.value && activeTab.value === 'all-courses') {
-      result = await apiService.getAllCoursesForAdmin()
-      courses.value = Array.isArray(result) ? result : result.courses || []
+      // Admin view - get all courses with ?all=true parameter
+      result = await apiService.getCourses(currentPage.value, pageSize.value)
+      // For admin, we need to modify the API call to get all courses
+      const adminResult = await apiService.getAllCoursesForAdmin()
+      courses.value = Array.isArray(adminResult) ? adminResult : adminResult.courses || []
+      // Set pagination for admin (simplified - no pagination for getAllCoursesForAdmin)
+      pagination.value = {
+        total: courses.value.length,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false
+      }
     } else {
-      result = await apiService.getCourses(1, 10)
+      result = await apiService.getCourses(currentPage.value, pageSize.value)
       courses.value = result.courses || []
+      pagination.value = result.pagination || {
+        total: 0,
+        totalPages: 0,
+        hasNext: false,
+        hasPrev: false
+      }
     }
   } catch (error) {
     console.error('Error loading courses:', error)
+    courses.value = []
+    pagination.value = { total: 0, totalPages: 0, hasNext: false, hasPrev: false }
   }
 }
 
@@ -201,6 +259,28 @@ const loadEnrolledCourses = async () => {
     enrolledCourses.value = result
   } catch (error) {
     console.error('Error loading enrolled courses:', error)
+  }
+}
+
+// Pagination navigation functions
+const goToPage = (page) => {
+  if (page >= 1 && page <= pagination.value.totalPages) {
+    currentPage.value = page
+    loadCourses()
+  }
+}
+
+const nextPage = () => {
+  if (pagination.value.hasNext) {
+    currentPage.value++
+    loadCourses()
+  }
+}
+
+const prevPage = () => {
+  if (pagination.value.hasPrev) {
+    currentPage.value--
+    loadCourses()
   }
 }
 
@@ -447,6 +527,53 @@ onMounted(() => {
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-2xl);
+  padding: var(--spacing-xl);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.pagination-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--color-border-medium);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-weight: var(--font-weight-medium);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-dark);
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pagination-info {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.total-info {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
 }
 
 @media (max-width: 768px) {

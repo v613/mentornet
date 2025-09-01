@@ -2,6 +2,7 @@ import { executeQuery } from './shared/database.js';
 import { withAuth, hasRole } from './shared/auth.js';
 import { validateCourseData } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError, permissionError } from './shared/response.js';
+import { t } from './shared/i18n.js';
 
 /**
  * Create new course endpoint
@@ -16,7 +17,7 @@ export async function handler(event) {
   
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
-    return errorResponse('Method not allowed', 405);
+    return errorResponse(t('courses.messages.methodNotAllowed'), 405);
   }
   
   // Authenticate request
@@ -24,7 +25,7 @@ export async function handler(event) {
     try {
       // Check if user has permission to create courses (mentor or admin)
       if (!hasRole(user, ['mentor', 'admin'])) {
-        return permissionError('Only mentors and admins can create courses');
+        return permissionError(t('courses.messages.onlyMentorsAndAdminsCanCreateCourses'));
       }
       
       // Parse request body
@@ -93,11 +94,11 @@ export async function handler(event) {
       
       if (!courseResult.success) {
         console.error('Database error creating course:', courseResult.error);
-        return serverError('Failed to create course');
+        return serverError(t('courses.messages.failedToCreateCourse'));
       }
       
       if (courseResult.data.length === 0) {
-        return serverError('Failed to create course');
+        return serverError(t('courses.messages.failedToCreateCourse'));
       }
       
       const course = courseResult.data[0];
@@ -118,7 +119,7 @@ export async function handler(event) {
       return successResponse({
         course: processedCourse,
         courseId: course.courseId,
-        message: 'Course created successfully'
+        message: t('courses.messages.courseCreatedSuccessfully')
       }, 201);
       
     } catch (error) {
@@ -126,7 +127,7 @@ export async function handler(event) {
       
       // Handle JSON parse errors
       if (error instanceof SyntaxError) {
-        return validationError('Invalid JSON in request body');
+        return validationError(t('courses.messages.invalidJsonInRequestBody'));
       }
       
       return serverError('Failed to create course');

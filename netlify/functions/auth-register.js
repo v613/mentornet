@@ -1,6 +1,7 @@
 import { executeQuery } from './shared/database.js';
 import { validateRequiredFields, isValidEmail, validatePassword } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError } from './shared/response.js';
+import { t } from './shared/i18n.js';
 
 /**
  * User registration endpoint
@@ -16,7 +17,7 @@ export async function handler(event) {
   
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
-    return errorResponse('Method not allowed', 405);
+    return errorResponse(t('courses.messages.methodNotAllowed'), 405);
   }
   
   try {
@@ -33,13 +34,13 @@ export async function handler(event) {
     
     // Validate email format
     if (!isValidEmail(email)) {
-      return validationError('Invalid email format', null, 'INVALID_EMAIL');
+      return validationError(t('auth.errors.invalidEmail'), null, 'INVALID_EMAIL');
     }
     
     // Validate password strength
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
-      return validationError(passwordValidation.error, null, 'WEAK_PASSWORD');
+      return validationError(t('courses.messages.weakPassword'), null, 'WEAK_PASSWORD');
     }
     
     // Check if user already exists
@@ -49,11 +50,11 @@ export async function handler(event) {
     
     if (!existingUserResult.success) {
       console.error('Database error checking existing user:', existingUserResult.error);
-      return serverError('Registration failed');
+      return serverError(t('courses.messages.registrationFailed'));
     }
     
     if (existingUserResult.data.length > 0) {
-      return errorResponse('User already exists with this username or email', 409, 'USER_EXISTS');
+      return errorResponse(t('courses.messages.userAlreadyExists'), 409, 'USER_EXISTS');
     }
     
     // Insert new user with encrypted password
@@ -68,14 +69,14 @@ export async function handler(event) {
       
       // Handle unique constraint violations
       if (newUserResult.code === '23505') {
-        return errorResponse('User already exists with this username or email', 409, 'USER_EXISTS');
+        return errorResponse(t('courses.messages.userAlreadyExists'), 409, 'USER_EXISTS');
       }
       
-      return serverError('Registration failed');
+      return serverError(t('courses.messages.registrationFailed'));
     }
     
     if (newUserResult.data.length === 0) {
-      return serverError('Failed to create user');
+      return serverError(t('courses.messages.failedToCreateUser'));
     }
     
     const newUser = newUserResult.data[0];
@@ -96,7 +97,7 @@ export async function handler(event) {
     
     // Handle JSON parse errors
     if (error instanceof SyntaxError) {
-      return validationError('Invalid JSON in request body');
+      return validationError(t('courses.messages.invalidJsonInRequestBody'));
     }
     
     return serverError('Registration failed');

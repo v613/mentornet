@@ -2,6 +2,7 @@ import { executeQuery } from './shared/database.js';
 import { withAuth, hasRole } from './shared/auth.js';
 import { isValidUUID } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError, notFoundError } from './shared/response.js';
+import { t } from './shared/i18n.js';
 
 /**
  * Course deletion endpoint
@@ -25,7 +26,7 @@ export async function handler(event) {
         },
         body: JSON.stringify({ 
           success: false, 
-          error: 'Admin access required',
+          error: t('courses.messages.adminAccessRequired'),
           errorCode: 'ADMIN_REQUIRED'
         })
       };
@@ -35,7 +36,7 @@ export async function handler(event) {
       case 'DELETE':
         return handleDeleteCourse(event, user);
       default:
-        return errorResponse('Method not allowed', 405);
+        return errorResponse(t('courses.messages.methodNotAllowed'), 405);
     }
   });
 }
@@ -50,12 +51,12 @@ async function handleDeleteCourse(event, user) {
     const courseId = queryParams.courseId;
     
     if (!courseId) {
-      return validationError('Course ID is required');
+      return validationError(t('courses.messages.courseIdRequired'));
     }
 
     // Validate courseId format (should be numeric for this system)
     if (!/^\d+$/.test(courseId)) {
-      return validationError('Invalid course ID format');
+      return validationError(t('courses.messages.invalidCourseIdFormat'));
     }
 
     // Check if course exists
@@ -68,11 +69,11 @@ async function handleDeleteCourse(event, user) {
     
     if (!courseResult.success) {
       console.error('Database error checking course:', courseResult.error);
-      return serverError('Failed to check course');
+      return serverError(t('courses.messages.failedToCheckCourse'));
     }
     
     if (courseResult.data.length === 0) {
-      return notFoundError('Course not found');
+      return notFoundError(t('courses.messages.courseNotFound'));
     }
 
     const course = courseResult.data[0];
@@ -86,13 +87,13 @@ async function handleDeleteCourse(event, user) {
     
     if (!subscriptionsResult.success) {
       console.error('Database error checking subscriptions:', subscriptionsResult.error);
-      return serverError('Failed to check course subscriptions');
+      return serverError(t('courses.messages.failedToCheckCourseSubscriptions'));
     }
 
     const activeSubscriptions = parseInt(subscriptionsResult.data[0].count);
     
     if (activeSubscriptions > 0) {
-      return validationError('Cannot delete course with active enrollments. Please archive the course instead.');
+      return validationError(t('courses.messages.cannotDeleteCourseWithEnrollments'));
     }
 
     // Delete the course (this will cascade delete related subscriptions due to foreign keys)
@@ -103,16 +104,16 @@ async function handleDeleteCourse(event, user) {
     
     if (!deleteResult.success) {
       console.error('Database error deleting course:', deleteResult.error);
-      return serverError('Failed to delete course');
+      return serverError(t('courses.messages.failedToDeleteCourse'));
     }
     
     return successResponse({
-      message: `Course "${course.title}" deleted successfully`,
+      message: t('courses.messages.courseDeletedSuccessfully'),
       courseId: course.course_id
     });
     
   } catch (error) {
     console.error('Delete course function error:', error);
-    return serverError('Failed to delete course');
+    return serverError(t('courses.messages.failedToDeleteCourse'));
   }
 }

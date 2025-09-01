@@ -134,3 +134,17 @@ export function isValidUUID(uuid) {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
 }
+
+/**
+ * Validate integer ID format
+ * @param {string|number} id ID to validate
+ * @returns {boolean} Is valid integer ID
+ */
+export function isValidIntegerId(id) {
+  // Convert to string for consistent validation
+  const idStr = String(id);
+  
+  // Check if it's a positive integer
+  const num = parseInt(idStr, 10);
+  return !isNaN(num) && num > 0 && String(num) === idStr;
+}

@@ -130,7 +130,14 @@ const handleSubmit = async () => {
         
         emit('auth-success', authUser)
       } else {
-        error.value = t ? t('auth.errors.invalidCredentials') : 'Invalid credentials'
+        // Handle different error types from backend
+        const errorMap = {
+          'USER_BLOCKED': 'auth.accountBlockedMessage',
+          'INVALID_CREDENTIALS': 'auth.errors.invalidCredentials',
+          'USER_NOT_FOUND': 'auth.errors.userNotFound'
+        }
+        const errorKey = errorMap[result.errorCode] || 'auth.errors.invalidCredentials'
+        error.value = t ? t(errorKey) : result.error || 'Authentication failed'
       }
     } else {
       // API registration for signup
@@ -173,7 +180,7 @@ const handleSubmit = async () => {
     }
   } catch (err) {
     console.error('Auth error:', err)
-    error.value = 'An unexpected error occurred'
+    error.value = t ? t('auth.errors.authenticationFailed') : 'An unexpected error occurred'
   } finally {
     loading.value = false
   }

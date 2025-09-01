@@ -2,6 +2,7 @@ import { executeQuery } from './shared/database.js';
 import { validatePagination } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, serverError } from './shared/response.js';
 import { verifyToken, hasRole } from './shared/auth.js';
+import { t } from './shared/i18n.js';
 
 /**
  * Get courses with pagination
@@ -15,7 +16,7 @@ export async function handler(event) {
   
   // Only allow GET requests
   if (event.httpMethod !== 'GET') {
-    return errorResponse('Method not allowed', 405);
+    return errorResponse(t('courses.messages.methodNotAllowed'), 405);
   }
   
   try {
@@ -43,7 +44,7 @@ export async function handler(event) {
           },
           body: JSON.stringify({ 
             success: false, 
-            error: 'Admin access required to view all courses',
+            error: t('courses.messages.adminAccessRequiredForAllCourses'),
             errorCode: 'ADMIN_REQUIRED'
           })
         };
@@ -61,7 +62,7 @@ export async function handler(event) {
     
     if (!countResult.success) {
       console.error('Database error getting course count:', countResult.error);
-      return serverError('Failed to load courses');
+      return serverError(t('courses.messages.failedToLoadCourses'));
     }
     
     const total = parseInt(countResult.data[0]?.total || 0);
@@ -105,7 +106,7 @@ export async function handler(event) {
     
     if (!coursesResult.success) {
       console.error('Database error getting courses:', coursesResult.error);
-      return serverError('Failed to load courses');
+      return serverError(t('courses.messages.failedToLoadCourses'));
     }
     
     // Process JSON fields and format data
@@ -136,6 +137,6 @@ export async function handler(event) {
     
   } catch (error) {
     console.error('Get courses function error:', error);
-    return serverError('Failed to load courses');
+    return serverError(t('courses.messages.failedToLoadCourses'));
   }
 }

@@ -47,7 +47,7 @@
         <div class="user-card" v-for="user in users" :key="user.id">
           <div class="user-info">
             <div class="user-avatar">
-              <img v-if="user.profileImage" :src="user.profileImage" :alt="user.displayName" />
+              <img v-if="user.img" :src="user.img" :alt="user.displayName" />
               <div v-else class="avatar-placeholder">
                 {{ (user.displayName || user.userid).substring(0, 2).toUpperCase() }}
               </div>
@@ -228,9 +228,9 @@ const saveUserProfile = async (updatedUser) => {
   try {
     const result = await apiService.updateAnyUserProfile(updatedUser.id, {
       displayName: updatedUser.displayName,
-      profileImage: updatedUser.profileImage,
+      img: updatedUser.img,
       description: updatedUser.description,
-      department: updatedUser.department,
+      // department: updatedUser.department,
       location: updatedUser.location,
       experience: updatedUser.experience,
       skills: updatedUser.skills,
