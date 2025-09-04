@@ -467,6 +467,13 @@ onMounted(() => {
   margin: 0;
 }
 
+@media (prefers-color-scheme: dark) {
+  .course-header h2 {
+    color: var(--vt-c-text-dark-2);
+    margin: 0;
+  }
+}
+
 .create-btn {
   background: var(--color-primary-gradient);
   color: var(--color-text-inverse);

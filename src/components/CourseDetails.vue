@@ -556,10 +556,32 @@ const formatTimeSlot = (slot) => {
   z-index: 1001;
 }
 
+@media (prefers-color-scheme: dark) {
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: var(--vt-c-black);
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+  }
+}
+
 .modal-header h2 {
   margin: 0;
   color: #333;
   flex: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal-header h2 {
+    margin: 0;
+    color: var(--vt-c-text-dark-2);
+    flex: 1;
+  }
 }
 
 .status {
@@ -604,11 +626,27 @@ const formatTimeSlot = (slot) => {
   padding: 1.5rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  .modal-content {
+    padding: 1.5rem;
+    background-color: var(--vt-c-black);
+  }
+}
+
 .course-info-section h4 {
   color: #333;
   margin: 0 0 1rem 0;
   border-bottom: 2px solid #4CAF50;
   padding-bottom: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .course-info-section h4 {
+    color: var(--vt-c-text-dark-2);
+    margin: 0 0 1rem 0;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 0.5rem;
+  }
 }
 
 .info-grid {
@@ -620,6 +658,15 @@ const formatTimeSlot = (slot) => {
   padding: 1.5rem;
   border-radius: 6px;
   border: 1px solid #e0e0e0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .info-card {
+    background-color: var(--vt-c-black);
+    padding: 1.5rem;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+  }
 }
 
 .info-item {
@@ -639,8 +686,21 @@ const formatTimeSlot = (slot) => {
   color: #666;
 }
 
+@media (prefers-color-scheme: dark) {
+  .label {
+    font-weight: 500;
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
 .value {
   color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .value {
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .description-section,
@@ -660,11 +720,29 @@ const formatTimeSlot = (slot) => {
   color: #333;
   margin-bottom: 0.5rem;
 }
+@media (prefers-color-scheme: dark) {
+  .description-section h4,
+  .objectives-section h4,
+  .skills-section h4,
+  .prerequisites-section h4,
+  .settings-section h4 {
+    color: var(--vt-c-text-dark-2);
+    margin-bottom: 0.5rem;
+  }
+}
 
 .description-section p,
 .objectives-section p {
   line-height: 1.6;
   color: #666;
+}
+
+@media (prefers-color-scheme: dark) {
+  .description-section p,
+  .objectives-section p {
+    line-height: 1.6;
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .skills-tags {
@@ -691,6 +769,13 @@ const formatTimeSlot = (slot) => {
   color: #666;
 }
 
+@media (prefers-color-scheme: dark) {
+  .prerequisites-list li {
+    margin-bottom: 0.5rem;
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -705,6 +790,18 @@ const formatTimeSlot = (slot) => {
   background-color: #f8f9fa;
   border-radius: 4px;
   border: 1px solid #e0e0e0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .setting-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background-color: var(--vt-c-black);
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+  }
 }
 
 .setting-icon {
@@ -737,15 +834,39 @@ const formatTimeSlot = (slot) => {
   background-color: #f8f9fa;
 }
 
+@media (prefers-color-scheme: dark) {
+  .application-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 1rem;
+    background-color: var(--vt-c-black-soft);
+  }
+}
+
 .applicant-info h5 {
   margin: 0 0 0.5rem 0;
   color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+    .applicant-info h5 {
+      margin: 0 0 0.5rem 0;
+      color: var(--vt-c-text-dark-1);
+  }
 }
 
 .application-date {
   margin: 0;
   color: #666;
   font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .application-date {
+    margin: 0;
+    color: var(--vt-c-text-dark-2);
+    font-size: 0.9rem;
+  }
 }
 
 .application-content {
@@ -755,6 +876,13 @@ const formatTimeSlot = (slot) => {
 .application-content p {
   margin: 0.5rem 0;
   color: #666;
+}
+
+@media (prefers-color-scheme: dark) {
+  .application-content p {
+    margin: 0.5rem 0;
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .application-actions {
@@ -799,6 +927,20 @@ const formatTimeSlot = (slot) => {
   position: sticky;
   bottom: 0;
   background: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  .course-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+    position: sticky;
+    bottom: 0;
+    background: var(--vt-c-black);
+  }
 }
 
 .action-btn {

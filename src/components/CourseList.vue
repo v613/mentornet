@@ -369,6 +369,18 @@ const cancelCourseApplication = async (course) => {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+@media (prefers-color-scheme: dark) {
+  .course-card {
+    background: var(--vt-c-black);
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+}
+
 .course-card:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   transform: translateY(-2px);
@@ -386,6 +398,15 @@ const cancelCourseApplication = async (course) => {
   color: #333;
   font-size: 1.3rem;
   line-height: 1.4;
+}
+
+@media (prefers-color-scheme: dark) {
+  .course-header h3 {
+    margin: 0;
+    color: var(--vt-c-text-dark-2);
+    font-size: 1.3rem;
+    line-height: 1.4;
+  }
 }
 
 .status {
@@ -451,6 +472,12 @@ const cancelCourseApplication = async (course) => {
 
 .value {
   color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .value {
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .skills-tags {

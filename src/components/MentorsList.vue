@@ -100,6 +100,15 @@ const handleImageError = (event, mentor) => {
   font-weight: var(--font-weight-semibold);
 }
 
+@media (prefers-color-scheme: dark) {
+  .mentors-container h2 {
+    color: var(--vt-c-text-dark-2);
+    margin-bottom: var(--spacing-xl);
+    font-size: 1.8rem;
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
 .loading, .error {
   text-align: center;
   padding: var(--spacing-xl);
@@ -126,6 +135,17 @@ const handleImageError = (event, mentor) => {
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
   border: 1px solid var(--color-border-light);
+}
+
+@media (prefers-color-scheme: dark) {
+.mentor-card {
+  background: var(--vt-c-black);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  border: 1px solid var(--vt-c-divider-dark-1);
+}
 }
 
 .mentor-card:hover {
@@ -195,12 +215,30 @@ const handleImageError = (event, mentor) => {
   color: var(--color-text-primary);
   font-size: 1.2rem;
   font-weight: var(--font-weight-semibold);
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mentor-name {
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--vt-c-text-dark-2);
+    font-size: 1.2rem;
+    font-weight: var(--font-weight-semibold);
+  }
 }
 
 .mentor-email {
   margin: 0 0 var(--spacing-xs) 0;
   color: var(--color-text-secondary);
   font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mentor-email {
+    margin: 0 0 var(--spacing-xs) 0;
+    color: var(--vt-c-text-dark-2);
+    font-size: 0.9rem;
+  }
 }
 
 .mentor-userid {
@@ -210,12 +248,31 @@ const handleImageError = (event, mentor) => {
   opacity: 0.7;
 }
 
+@media (prefers-color-scheme: dark) {
+  .mentor-userid {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--vt-c-text-dark-2);
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+}
+
 .mentor-skills {
   text-align: left;
   background: var(--color-bg-tertiary, #f8f9fa);
   padding: var(--spacing-md);
   border-radius: var(--radius-sm);
   margin-top: var(--spacing-md);
+}
+
+@media (prefers-color-scheme: dark) {
+  .mentor-skills {
+    text-align: left;
+    background: var(--vt-c-black-mute);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    margin-top: var(--spacing-md);
+  }
 }
 
 .mentor-skills h4 {
@@ -232,6 +289,15 @@ const handleImageError = (event, mentor) => {
   color: var(--color-text-secondary);
   font-size: 0.85rem;
   line-height: 1.4;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mentor-skills p {
+    margin: 0;
+    color: var(--vt-c-text-dark-2);
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
 }
 
 .no-mentors {

@@ -140,6 +140,17 @@ const checkExistingSession = async () => {
   margin-bottom: var(--spacing-lg);
 }
 
+@media (prefers-color-scheme: dark) {
+  .user-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    background-color: var(--vt-c-black);
+    margin-bottom: var(--spacing-lg);
+  }
+}
+
 .sign-out-btn {
   padding: var(--spacing-sm) var(--spacing-lg);
   background-color: var(--color-error);
@@ -173,6 +184,13 @@ header {
 .dashboard-header h1 {
   margin: 0;
   color: var(--color-text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .dashboard-header h1 {
+    margin: 0;
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .user-role {
@@ -224,8 +242,15 @@ header {
 
 .nav-tab:hover {
   color: var(--color-text-primary);
-  background-color: var(--color-bg-secondary);
+  background-color: var(--vt-c-black-soft);
 }
+
+@media (prefers-color-scheme: dark) {
+  .nav-tab:hover {
+    color: var(--vt-c-text-dark-1);
+    background-color: var(--vt-c-black-soft);
+  }
+}  
 
 .nav-tab.active {
   color: var(--color-primary-start);

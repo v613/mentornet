@@ -477,6 +477,13 @@ const validatePassword = () => {
   margin-bottom: var(--spacing-sm);
 }
 
+@media (prefers-color-scheme: dark) {
+  .profile-header h2 {
+    color: var(--vt-c-text-dark-2);
+    margin-bottom: var(--spacing-sm);
+  }
+}
+
 .profile-description {
   color: var(--color-text-tertiary);
   font-size: 1rem;
@@ -493,6 +500,15 @@ const validatePassword = () => {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-base);
   overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .profile-form {
+    background: var(--vt-c-black-mute);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-base);
+    overflow: hidden;
+  }
 }
 
 .form-sections {
@@ -518,6 +534,15 @@ const validatePassword = () => {
   font-weight: var(--font-weight-semibold);
 }
 
+@media (prefers-color-scheme: dark) {
+  .form-section h3 {
+    color: var(--vt-c-text-dark-2);
+    margin-bottom: var(--spacing-xl);
+    font-size: 1.2rem;
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -535,6 +560,14 @@ const validatePassword = () => {
   color: var(--color-text-primary);
 }
 
+@media (prefers-color-scheme: dark) {
+  .form-group label {
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-sm);
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
 .form-input,
 .form-select,
 .form-textarea {
@@ -547,6 +580,20 @@ const validatePassword = () => {
   transition: border-color var(--transition-base);
 }
 
+@media (prefers-color-scheme: dark) {
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    background-color: var(--vt-c-black-soft);
+    color: var(--vt-c-text-dark-1);
+    transition: border-color var(--transition-base);
+  }
+}
+
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
@@ -557,6 +604,13 @@ const validatePassword = () => {
 .form-input.readonly {
   background-color: var(--color-bg-secondary);
   color: var(--color-text-tertiary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .form-input.readonly {
+    background-color: var(--vt-c-black);
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .form-textarea {
@@ -598,6 +652,17 @@ const validatePassword = () => {
   justify-content: flex-end;
 }
 
+@media (prefers-color-scheme: dark) {
+  .form-actions {
+    padding: var(--spacing-xl) var(--spacing-2xl);
+    background-color: var(--vt-c-black-soft);
+    border-top: 1px solid var(--color-border-light);
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: flex-end;
+  }
+}
+
 .btn-primary,
 .btn-secondary {
   padding: var(--spacing-md) var(--spacing-xl);
@@ -631,10 +696,25 @@ const validatePassword = () => {
   border: 1px solid var(--color-border-medium);
 }
 
+@media (prefers-color-scheme: dark) {
+  .btn-secondary {
+    background-color: var(--vt-c-black-mute);
+    color: var(--vt-c-text-dark-1);
+    border: 1px solid var(--color-border-medium);
+  }
+}
+
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--color-bg-secondary);
   border-color: var(--color-border-dark);
 }
+
+@media (prefers-color-scheme: dark) {
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--vt-c-divider-dark-1);
+    border-color: var(--vt-c-divider-dark-1);
+  }
+}  
 
 .btn-secondary:disabled {
   opacity: 0.6;

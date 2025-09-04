@@ -550,6 +550,18 @@ const submitCourse = async (status) => {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
+@media (prefers-color-scheme: dark) {
+  .create-course-modal {
+    background: var(--vt-c-black-mute);
+    border-radius: 8px;
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -562,9 +574,30 @@ const submitCourse = async (status) => {
   z-index: 1001;
 }
 
+@media (prefers-color-scheme: dark) {
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: var(--vt-c-black-soft);
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+  }
+}
+
 .modal-header h2 {
   margin: 0;
   color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal-header h2 {
+    margin: 0;
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .close-btn {
@@ -608,6 +641,15 @@ const submitCourse = async (status) => {
   color: #333;
 }
 
+@media (prefers-color-scheme: dark) {
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
 .form-input,
 .form-textarea,
 .form-select {
@@ -618,6 +660,22 @@ const submitCourse = async (status) => {
   font-size: 1rem;
   transition: border-color 0.3s;
   box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+  .form-input,
+  .form-textarea,
+  .form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+    background-color: var(--vt-c-black-soft);
+    color: var(--vt-c-text-dark-1);
+  }
 }
 
 .form-input:focus,
@@ -641,6 +699,16 @@ const submitCourse = async (status) => {
   background-color: #f8f9fa;
 }
 
+@media (prefers-color-scheme: dark) {
+  .skills-section,
+  .prerequisites-section {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    background-color: var(--vt-c-black);
+  }
+}
+
 .skill-item,
 .prerequisite-item {
   display: flex;
@@ -655,6 +723,18 @@ const submitCourse = async (status) => {
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .skill-input,
+  .prerequisite-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: var(--vt-c-black);
+    color: var(--vt-c-text-dark-1);
+  }
 }
 
 .remove-btn {
@@ -695,6 +775,15 @@ const submitCourse = async (status) => {
   border-radius: 4px;
   padding: 1rem;
   background-color: #f8f9fa;
+}
+
+@media (prefers-color-scheme: dark) {
+  .time-slots-section {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    background-color: var(--vt-c-black-soft);
+  }
 }
 
 .time-slot-item {
@@ -761,6 +850,20 @@ const submitCourse = async (status) => {
   bottom: 0;
   background: white;
 }
+
+@media (prefers-color-scheme: dark) {
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+    position: sticky;
+    bottom: 0;
+    background: var(--vt-c-black-mute);
+  }
+}  
 
 .cancel-btn {
   background: #6c757d;

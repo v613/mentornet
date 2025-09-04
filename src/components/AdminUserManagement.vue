@@ -308,6 +308,13 @@ const toggleUserBlock = async (user) => {
   align-items: end;
 }
 
+@media (prefers-color-scheme: dark) {
+  .filters-section {
+    background: var(--vt-c-black-mute);
+    border: 1px solid var(--vt-c-divider-dark-1);
+  }
+}
+
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -319,6 +326,12 @@ const toggleUserBlock = async (user) => {
   color: var(--color-text-primary);
 }
 
+@media (prefers-color-scheme: dark) {
+  .filter-group label {
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
 .filter-select,
 .search-input {
   padding: var(--spacing-md);
@@ -328,6 +341,14 @@ const toggleUserBlock = async (user) => {
   background-color: var(--color-input-bg);
   color: var(--color-text-primary);
   transition: border-color var(--transition-base);
+}
+
+@media (prefers-color-scheme: dark) {
+  .filter-select,
+  .search-input {
+    background-color: var(--vt-c-black-mute);
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .filter-select:focus,
@@ -372,9 +393,23 @@ const toggleUserBlock = async (user) => {
   transition: all var(--transition-base);
 }
 
+@media (prefers-color-scheme: dark) {
+  .pagination-btn {
+    border: 1px solid var(--color-border-medium);
+    background: var(--vt-c-black-mute);
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
 .pagination-btn:hover:not(:disabled) {
   background: var(--color-bg-secondary);
   border-color: var(--color-border-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pagination-btn:hover:not(:disabled) {
+    background: var(--vt-c-black);
+  }
 }
 
 .pagination-btn:disabled {
@@ -427,6 +462,13 @@ const toggleUserBlock = async (user) => {
   transition: all var(--transition-base);
 }
 
+@media (prefers-color-scheme: dark) {
+  .user-card {
+    background: var(--vt-c-black-mute);
+    border: 1px solid var(--color-border-light);
+  }
+}
+
 .user-card:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--color-border-medium);
@@ -472,10 +514,22 @@ const toggleUserBlock = async (user) => {
   font-size: 1.1rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  .user-details h3 {
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
 .user-email {
   margin: 0 0 var(--spacing-sm) 0;
   color: var(--color-text-secondary);
   font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .user-email {
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .user-meta {
@@ -542,9 +596,24 @@ const toggleUserBlock = async (user) => {
   border: 1px solid var(--color-border-medium);
 }
 
+@media (prefers-color-scheme: dark) {
+  .btn-secondary {
+    background-color: var(--vt-c-black-mute);
+    color: var(--vt-c-text-dark-2);
+    border: 1px solid var(--vt-c-divider-dark-1);
+  }
+}
+
 .btn-secondary:hover {
   background-color: var(--color-bg-tertiary);
   border-color: var(--color-border-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-secondary:hover {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-border-dark);
+  }
 }
 
 .btn-danger {
@@ -595,6 +664,12 @@ const toggleUserBlock = async (user) => {
   box-shadow: var(--shadow-modal);
 }
 
+@media (prefers-color-scheme: dark) {
+  .modal-content {
+    background: var(--vt-c-black-mute);
+  }
+}
+
 .modal-header {
   padding: var(--spacing-xl);
   border-bottom: 1px solid var(--color-border-light);
@@ -606,6 +681,12 @@ const toggleUserBlock = async (user) => {
 .modal-header h3 {
   margin: 0;
   color: var(--color-text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal-header h3 {
+    color: var(--vt-c-text-dark-2);
+  }
 }
 
 .close-btn {
@@ -622,6 +703,12 @@ const toggleUserBlock = async (user) => {
   justify-content: center;
   border-radius: var(--radius-sm);
   transition: background-color var(--transition-base);
+}
+
+@media (prefers-color-scheme: dark) {
+  .close-btn {
+    color: var(--vt-c-text-dark-1);
+  }
 }
 
 .close-btn:hover {
