@@ -11,7 +11,7 @@
     </div>
     
     <div v-else class="mentors-grid">
-      <div v-for="mentor in mentors" :key="mentor.id" class="mentor-card">
+      <div v-for="mentor in mentors" :key="mentor.id" class="mentor-card" :class="{ 'has-cv': mentor.cv }" @click="openCV(mentor)">
         <div class="mentor-photo">
           <img 
             v-if="mentor.img" 
@@ -86,6 +86,12 @@ const handleImageError = (event, mentor) => {
   mentor.img = null
   event.target.style.display = 'none'
 }
+
+const openCV = (mentor) => {
+  if (mentor.cv) {
+    window.open(mentor.cv, '_blank')
+  }
+}
 </script>
 
 <style scoped>
@@ -151,6 +157,10 @@ const handleImageError = (event, mentor) => {
 .mentor-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.mentor-card.has-cv {
+  cursor: pointer;
 }
 
 .mentor-photo {

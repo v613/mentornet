@@ -177,6 +177,48 @@ class ApiService {
   }
 
   /**
+   * Authenticate user with TOTP
+   * @param {string} userid Username
+   * @param {string} code TOTP code
+   * @returns {Promise<Object>} Authentication result with token and user data
+   */
+  async authenticateUserTotp(userid, code) {
+    const response = await this.post('/auth-totp', { userid, code });
+    
+    if (response.success && response.token) {
+      this.setToken(response.token);
+    }
+    
+    return response;
+  }
+
+  /**
+   * Setup TOTP for current user
+   * @returns {Promise<Object>} Setup result with QR code and secret
+   */
+  async setupTotp() {
+    return this.post('/totp-setup', {});
+  }
+
+  /**
+   * Verify TOTP setup with code
+   * @param {string} code TOTP verification code
+   * @returns {Promise<Object>} Verification result
+   */
+  async verifyTotpSetup(code) {
+    return this.post('/totp-verify-setup', { code });
+  }
+
+  /**
+   * Disable TOTP for current user
+   * @param {string} password User's password for confirmation
+   * @returns {Promise<Object>} Disable result
+   */
+  async disableTotp(password) {
+    return this.post('/totp-disable', { password });
+  }
+
+  /**
    * Logout user (clear token)
    */
   logout() {

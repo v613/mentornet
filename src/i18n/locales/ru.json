@@ -17,6 +17,10 @@
     "emailPlaceholder": "Введите email",
     "password": "Пароль",
     "passwordPlaceholder": "Введите пароль",
+    "loginWithPassword": "Войти с паролем",
+    "loginWithTotp": "Войти с OTP",
+    "totpCode": "OTP код",
+    "totpHelp": "Введите 6-значный код из приложения аутентификатора",
     "createMentorProfile": "Создать профиль ментора",
     "accountBlocked": "Аккаунт заблокирован",
     "accountBlockedMessage": "Ваш аккаунт был заблокирован администратором. Вы не можете получить доступ к курсам или менторам в данный момент. Пожалуйста, свяжитесь с поддержкой, если считаете, что это ошибка.",
@@ -32,7 +36,9 @@
       "userExists": "Пользователь уже существует",
       "emailExists": "Email уже существует",
       "userNotFound": "Пользователь не найден",
-      "accessDenied": "Доступ запрещен"
+      "accessDenied": "Доступ запрещен",
+      "invalidTotpCode": "Неверный TOTP код",
+      "rateLimited": "Слишком много попыток. Пожалуйста, подождите и попробуйте снова."
     }
   },
   "courses": {
@@ -312,6 +318,8 @@
     "availableForMentoring": "Доступен для менторской деятельности",
     "description": "Описание",
     "descriptionPlaceholder": "Расскажите о себе, своём опыте и целях...",
+    "cv": "Резюме/CV",
+    "cvPlaceholder": "Ссылка на ваше резюме или CV",
     "profileImage": "Изображение профиля",
     "profileImagePlaceholder": "https://example.com/your-profile-image.jpg",
     "currentPassword": "Текущий пароль",
@@ -319,6 +327,20 @@
     "confirmPassword": "Подтвердите новый пароль",
     "changePassword": "Изменить пароль",
     "passwordSecurity": "Пароль и безопасность",
+    "security": "Безопасность",
+    "twoFactorAuth": "Двухфакторная аутентификация",
+    "totpDescription": "Добавьте дополнительный уровень безопасности к вашему аккаунту с помощью одноразовых паролей на основе времени",
+    "totpEnabled": "Включено",
+    "totpDisabled": "Отключено",
+    "enableTotp": "Включить OTP",
+    "disableTotp": "Отключить OTP",
+    "disableTotpConfirm": "Отключить двухфакторную аутентификацию",
+    "disableTotpWarning": "Это удалит OTP защиту с вашего аккаунта. Для входа потребуется только пароль.",
+    "confirmPassword": "Подтвердить пароль",
+    "enterPassword": "Введите ваш пароль",
+    "disabling": "Отключение...",
+    "totpEnabledSuccess": "Двухфакторная аутентификация успешно включена",
+    "totpDisabledSuccess": "Двухфакторная аутентификация успешно отключена",
     "saveProfile": "Сохранить профиль",
     "resetChanges": "Сбросить изменения",
     "saving": "Сохранение...",
@@ -340,6 +362,46 @@
       "passwordHelp": "Оставьте пустым, чтобы сохранить текущий пароль",
       "passwordMismatch": "Новые пароли не совпадают",
       "passwordTooShort": "Пароль должен содержать минимум 6 символов"
+    },
+    "errors": {
+      "invalidPassword": "Неверный пароль",
+      "totpNotEnabled": "OTP не включен для этого аккаунта",
+      "disableFailed": "Не удалось отключить OTP",
+      "networkError": "Произошла сетевая ошибка"
+    }
+  },
+  "totp": {
+    "setup": {
+      "title": "Настройка двухфакторной аутентификации",
+      "step1Title": "Сканировать QR-код",
+      "step1Description": "Отсканируйте этот QR-код с помощью приложения аутентификации (Google Authenticator, Authy и т.д.)",
+      "manualEntry": "Не можете сканировать? Введите этот код вручную:",
+      "copy": "Копировать",
+      "next": "Далее",
+      "cancel": "Отмена",
+      "step2Title": "Проверьте настройку",
+      "step2Description": "Введите 6-значный код из приложения аутентификации для завершения настройки",
+      "verificationLabel": "Код подтверждения",
+      "verificationHelp": "Введите код, показанный в приложении аутентификации",
+      "back": "Назад",
+      "verify": "Проверить и включить",
+      "generatingQr": "Генерация QR-кода...",
+      "qrCodeAlt": "QR-код",
+      "copied": "Скопировано!",
+      "retry": "Повторить",
+      "verifying": "Проверка...",
+      "finish": "Завершить",
+      "successTitle": "Успех!",
+      "successDescription": "Двухфакторная аутентификация включена",
+      "errors": {
+        "setupFailed": "Не удалось настроить TOTP",
+        "networkError": "Произошла сетевая ошибка",
+        "incompleteCode": "Пожалуйста, введите полный 6-значный код",
+        "invalidCode": "Неверный код. Пожалуйста, попробуйте снова.",
+        "rateLimited": "Слишком много попыток. Пожалуйста, подождите и попробуйте снова.",
+        "alreadyEnabled": "TOTP уже включен для этого аккаунта",
+        "verificationFailed": "Проверка не удалась. Пожалуйста, попробуйте снова."
+      }
     }
   },
   "dashboard": {

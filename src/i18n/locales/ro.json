@@ -17,6 +17,10 @@
     "emailPlaceholder": "Introduceți email-ul",
     "password": "Parolă",
     "passwordPlaceholder": "Introduceți parola",
+    "loginWithPassword": "Conectare cu parola",
+    "loginWithTotp": "Conectare cu OTP",
+    "totpCode": "Cod OTP",
+    "totpHelp": "Introduceți codul de 6 cifre din aplicația de autentificare",
     "createMentorProfile": "Creează profil ca mentor",
     "accountBlocked": "Cont Blocat",
     "accountBlockedMessage": "Contul dumneavoastră a fost blocat de un administrator. Nu puteți accesa cursurile sau mentorii în acest moment. Vă rugăm să contactați suportul dacă credeți că aceasta este o eroare.",
@@ -32,7 +36,9 @@
       "userExists": "Utilizatorul există deja",
       "emailExists": "Email-ul există deja",
       "userNotFound": "Utilizator negăsit",
-      "accessDenied": "Acces interzis"
+      "accessDenied": "Acces interzis",
+      "invalidTotpCode": "Cod TOTP invalid",
+      "rateLimited": "Prea multe încercări. Vă rugăm să așteptați și să încercați din nou."
     }
   },
   "courses": {
@@ -312,6 +318,8 @@
     "availableForMentoring": "Disponibil pentru activități de mentorat",
     "description": "Descriere",
     "descriptionPlaceholder": "Spune-ne despre tine, experiența ta și obiectivele...",
+    "cv": "CV/Resume",
+    "cvPlaceholder": "Link către CV-ul sau resume-ul tău",
     "profileImage": "Imagine profil",
     "profileImagePlaceholder": "https://example.com/imaginea-ta-de-profil.jpg",
     "currentPassword": "Parola curentă",
@@ -319,6 +327,20 @@
     "confirmPassword": "Confirmă parola nouă",
     "changePassword": "Schimbă parola",
     "passwordSecurity": "Parolă și securitate",
+    "security": "Securitate",
+    "twoFactorAuth": "Autentificare cu doi factori",
+    "totpDescription": "Adăugați un nivel suplimentar de securitate contului dvs. cu parole de unică folosință bazate pe timp",
+    "totpEnabled": "Activat",
+    "totpDisabled": "Dezactivat",
+    "enableTotp": "Activează OTP",
+    "disableTotp": "Dezactivează OTP",
+    "disableTotpConfirm": "Dezactivează autentificarea cu doi factori",
+    "disableTotpWarning": "Aceasta va elimina protecția OTP de pe contul dvs. Veți avea nevoie doar de parolă pentru a vă conecta.",
+    "confirmPassword": "Confirmă parola",
+    "enterPassword": "Introduceți parola",
+    "disabling": "Se dezactivează...",
+    "totpEnabledSuccess": "Autentificarea cu doi factori a fost activată cu succes",
+    "totpDisabledSuccess": "Autentificarea cu doi factori a fost dezactivată cu succes",
     "saveProfile": "Salvează profilul",
     "resetChanges": "Resetează modificările",
     "saving": "Se salvează...",
@@ -340,6 +362,46 @@
       "passwordHelp": "Lasă gol pentru a păstra parola curentă",
       "passwordMismatch": "Parolele noi nu se potrivesc",
       "passwordTooShort": "Parola trebuie să aibă cel puțin 6 caractere"
+    },
+    "errors": {
+      "invalidPassword": "Parolă incorectă",
+      "totpNotEnabled": "OTP nu este activat pentru acest cont",
+      "disableFailed": "Eșec la dezactivarea OTP",
+      "networkError": "A apărut o eroare de rețea"
+    }
+  },
+  "totp": {
+    "setup": {
+      "title": "Configurează autentificarea cu doi factori",
+      "step1Title": "Scanează codul QR",
+      "step1Description": "Scanează acest cod QR cu aplicația ta de autentificare (Google Authenticator, Authy, etc.)",
+      "manualEntry": "Nu poți scana? Introdu acest cod manual:",
+      "copy": "Copiază",
+      "next": "Următorul",
+      "cancel": "Anulează",
+      "step2Title": "Verifică configurarea",
+      "step2Description": "Introdu codul de 6 cifre din aplicația ta de autentificare pentru a finaliza configurarea",
+      "verificationLabel": "Cod de verificare",
+      "verificationHelp": "Introdu codul afișat în aplicația ta de autentificare",
+      "back": "Înapoi",
+      "verify": "Verifică și activează",
+      "generatingQr": "Se generează codul QR...",
+      "qrCodeAlt": "Cod QR",
+      "copied": "Copiat!",
+      "retry": "Reîncercați",
+      "verifying": "Se verifică...",
+      "finish": "Termină",
+      "successTitle": "Succes!",
+      "successDescription": "Autentificarea cu doi factori este acum activă",
+      "errors": {
+        "setupFailed": "Eșec la configurarea TOTP",
+        "networkError": "A apărut o eroare de rețea",
+        "incompleteCode": "Vă rugăm să introduceți un cod complet de 6 cifre",
+        "invalidCode": "Cod invalid. Vă rugăm să încercați din nou.",
+        "rateLimited": "Prea multe încercări. Vă rugăm să așteptați și să încercați din nou.",
+        "alreadyEnabled": "TOTP este deja activat pentru acest cont",
+        "verificationFailed": "Verificarea a eșuat. Vă rugăm să încercați din nou."
+      }
     }
   },
   "dashboard": {

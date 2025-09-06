@@ -42,12 +42,14 @@ export async function handler(event) {
  */
 async function handleGetProfile(event, user) {
   try {
-    // Get full user profile data
+    // Get full user profile data including TOTP status
     const profileResult = await executeQuery(`
-      SELECT id, userid, email, role, img, description, display_name as "displayName", 
-             is_blocked as "isBlocked", created_at as "createdAt"
-      FROM users 
-      WHERE id = $1 
+      SELECT u.id, u.userid, u.email, u.role, u.img, u.description, u.display_name as "displayName", 
+             u.is_blocked as "isBlocked", u.created_at as "createdAt",
+             COALESCE(t.enabled, false) as "totpEnabled"
+      FROM users u
+      LEFT JOIN user_totp t ON u.id = t.id
+      WHERE u.id = $1 
       LIMIT 1
     `, [user.userId]);
     
@@ -72,7 +74,8 @@ async function handleGetProfile(event, user) {
         description: profile.description,
         displayName: profile.displayName,
         isBlocked: profile.isBlocked,
-        createdAt: profile.createdAt
+        createdAt: profile.createdAt,
+        totpEnabled: profile.totpEnabled
       }
     });
     

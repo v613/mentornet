@@ -17,6 +17,7 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }).unique().notNull(),
   pwd: text('pwd'),
   img: text('img'),
+  cv: text('cv'),
   description: text('description'),
   displayName: varchar('display_name', { length: 100 }), 
   role: varchar('role', { length: 10 }).notNull().default('mentee'),
@@ -67,12 +68,22 @@ export const blockedUsers = pgTable('blocked_users', {
   blockedAt: timestamp('blocked_at', { withTimezone: true }).defaultNow(),
 });
 
+// TOTP table for two-factor authentication
+export const userTotp = pgTable('user_totp', {
+  id: uuid('id').references(() => users.id, { onDelete: 'cascade' }).primaryKey(),
+  secret: text('secret').notNull(),
+  enabled: boolean('enabled').default(false),
+  setupCompletedAt: timestamp('setup_completed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
 // Define relationships
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   mentorCourses: many(courses),
   subscriptions: many(subscriptions),
   blockedByMe: many(blockedUsers, { relationName: 'blocker' }),
   blockedMe: many(blockedUsers, { relationName: 'blocked' }),
+  totp: one(userTotp),
 }));
 
 export const coursesRelations = relations(courses, ({ one, many }) => ({
@@ -104,5 +115,12 @@ export const blockedUsersRelations = relations(blockedUsers, ({ one }) => ({
     fields: [blockedUsers.blockedUserId],
     references: [users.id],
     relationName: 'blocked'
+  }),
+}));
+
+export const userTotpRelations = relations(userTotp, ({ one }) => ({
+  user: one(users, {
+    fields: [userTotp.id],
+    references: [users.id],
   }),
 }));

@@ -39,6 +39,17 @@
               :placeholder="$t('profile.profileImagePlaceholder')"
             />
           </div>
+
+          <div class="form-group">
+            <label for="cv">{{ $t('profile.cv') }}</label>
+            <input 
+              id="cv"
+              type="url" 
+              v-model="profile.cv"
+              class="form-input"
+              :placeholder="$t('profile.cvPlaceholder')"
+            />
+          </div>
         </div>
       </div>
 
@@ -46,8 +57,8 @@
       <div class="form-section">
         <h3>{{ $t('profile.profileDetails') }}</h3>
         
-        <div class="form-grid">
-          <!-- <div class="form-group">
+        <!-- <div class="form-grid">
+          <div class="form-group">
             <label for="department">{{ $t('profile.department') }}</label>
             <input 
               id="department"
@@ -56,7 +67,7 @@
               class="form-input"
               placeholder="Engineering, Marketing, etc."
             />
-          </div> -->
+          </div>
 
           <div class="form-group">
             <label for="location">{{ $t('profile.location') }}</label>
@@ -80,7 +91,7 @@
               max="50"
             />
           </div>
-        </div>
+        </div> -->
 
         <div class="form-group">
           <label for="description">{{ $t('profile.description') }}</label>
@@ -130,6 +141,7 @@
           </label>
         </div>
       </div>
+
     </div>
 
     <!-- Actions -->
@@ -147,11 +159,13 @@
       <p>{{ saveResult.message }}</p>
     </div>
   </form>
+
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { apiService } from '../services/api.js'
 
 const { t } = useI18n()
 
@@ -171,11 +185,13 @@ const emit = defineEmits(['save', 'cancel'])
 const saving = ref(false)
 const saveResult = ref(null)
 
+
 const profile = ref({
   id: '',
   email: '',
   displayName: '',
   profileImage: '',
+  cv: '',
   description: '',
   role: 'mentee',
   department: '',
@@ -212,6 +228,7 @@ onMounted(() => {
     email: props.user.email,
     displayName: props.user.displayName || props.user.userid,
     profileImage: props.user.profileImage || '',
+    cv: props.user.cv || '',
     description: props.user.description || '',
     role: props.user.role,
     department: props.user.department || '',
@@ -226,6 +243,7 @@ onMounted(() => {
   skillsText.value = profile.value.skills.join(', ')
   learningGoalsText.value = profile.value.learningGoals.join(', ')
 })
+
 
 const saveProfile = async () => {
   saving.value = true
@@ -487,6 +505,7 @@ const saveProfile = async () => {
   color: var(--color-error-dark);
   border: 1px solid var(--color-error);
 }
+
 
 @media (max-width: 768px) {
   .form-grid {

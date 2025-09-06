@@ -10,6 +10,27 @@
       <div class="auth-form">
       <h2>{{ $t(isLogin ? 'auth.signIn' : 'auth.signUp') }}</h2>
       
+      <div v-if="isLogin" class="login-method-toggle">
+        <div class="toggle-buttons">
+          <button
+            type="button"
+            @click="loginMethod = 'password'"
+            :class="{ active: loginMethod === 'password' }"
+            class="toggle-button"
+          >
+            {{ $t('auth.loginWithPassword') }}
+          </button>
+          <button
+            type="button"
+            @click="loginMethod = 'totp'"
+            :class="{ active: loginMethod === 'totp' }"
+            class="toggle-button"
+          >
+            {{ $t('auth.loginWithTotp') }}
+          </button>
+        </div>
+      </div>
+      
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label for="username">{{ $t('auth.username') }}</label>
@@ -33,14 +54,24 @@
           />
         </div>
         
-        <div class="form-group">
+        <div v-if="loginMethod === 'password' || !isLogin" class="form-group">
           <label for="password">{{ $t('auth.password') }}</label>
           <input
             id="password"
             v-model="password"
             type="password"
-            required
+            :required="loginMethod === 'password' || !isLogin"
             :placeholder="$t('auth.passwordPlaceholder')"
+          />
+        </div>
+        
+        <div v-if="isLogin && loginMethod === 'totp'" class="form-group">
+          <TOTPInput
+            v-model="totpCode"
+            :label="$t('auth.totpCode')"
+            :help-text="$t('auth.totpHelp')"
+            :error-message="error && error.includes('TOTP') ? error : ''"
+            @complete="handleSubmit"
           />
         </div>
         
@@ -81,22 +112,27 @@ import { useI18n } from 'vue-i18n'
 import { apiService } from '../services/api.js'
 import { tokenService } from '../services/tokenService.js'
 import LanguageSwitcher from './LanguageSwitcher.vue'
+import TOTPInput from './TOTPInput.vue'
 
 const emit = defineEmits(['auth-success'])
 const { t } = useI18n()
 
 const isLogin = ref(true)
+const loginMethod = ref('password')
 const username = ref('')
 const email = ref('')
 const password = ref('')
+const totpCode = ref('')
 const isMentor = ref(false)
 const loading = ref(false)
 const error = ref('')
 
 const toggleMode = () => {
   isLogin.value = !isLogin.value
+  loginMethod.value = 'password'
   isMentor.value = false
   error.value = ''
+  totpCode.value = ''
 }
 
 const handleSubmit = async () => {
@@ -104,19 +140,24 @@ const handleSubmit = async () => {
   error.value = ''
   
   if (isLogin.value) {
-    const result = await apiService.authenticateUser(username.value, password.value)
+    let result
+    if (loginMethod.value === 'password') {
+      result = await apiService.authenticateUser(username.value, password.value)
+    } else {
+      result = await apiService.authenticateUserTotp(username.value, totpCode.value)
+    }
+    
     if (result.success) {
       const authUser = {
         uid: result.user.id,
         id: result.user.id,
         userid: result.user.userid,
-        email: result.user.email,
+        email: result.user.email || '',
         displayName: result.user.displayName,
         role: result.user.role,
         isBlocked: result.user.isBlocked
       }
       
-      // Generate and store JWT token synchronously
       const token = await tokenService.generateToken(result.user)
       if (token) {
         tokenService.storeToken(token)
@@ -124,11 +165,12 @@ const handleSubmit = async () => {
       
       emit('auth-success', authUser)
     } else {
-      // Handle different error types from backend
       const errorMap = {
         'USER_BLOCKED': 'auth.accountBlockedMessage',
         'INVALID_CREDENTIALS': 'auth.errors.invalidCredentials',
-        'USER_NOT_FOUND': 'auth.errors.userNotFound'
+        'USER_NOT_FOUND': 'auth.errors.userNotFound',
+        'INVALID_CODE': 'auth.errors.invalidTotpCode',
+        'RATE_LIMITED': 'auth.errors.rateLimited'
       }
       const errorKey = errorMap[result.errorCode]
       error.value = errorKey ? t(errorKey) : (result.error || 'Authentication failed')
@@ -228,6 +270,61 @@ h2 {
   text-align: center;
   margin-bottom: var(--spacing-xl);
   color: var(--color-text-primary);
+}
+
+.login-method-toggle {
+  margin-bottom: var(--spacing-xl);
+}
+
+.toggle-buttons {
+  display: flex;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+  gap: var(--spacing-xs);
+}
+
+@media (prefers-color-scheme: dark) {
+  .toggle-buttons {
+    background: var(--vt-c-black);
+  }
+}
+
+.toggle-button {
+  flex: 1;
+  padding: var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .toggle-button {
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
+.toggle-button.active {
+  background: var(--color-primary-gradient);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-button:hover:not(.active) {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .toggle-button:hover:not(.active) {
+    background: var(--vt-c-black-mute);
+    color: var(--vt-c-text-dark-1);
+  }
 }
 
 .form-group {

@@ -58,8 +58,8 @@
         <div class="form-section">
           <h3>{{ $t('profile.profileDetails') }}</h3>
           
-          <div class="form-grid">
-            <!-- <div class="form-group">
+          <!-- <div class="form-grid">
+            <div class="form-group">
               <label for="department">{{ $t('profile.department') }}</label>
               <input 
                 id="department"
@@ -68,7 +68,7 @@
                 class="form-input"
                 placeholder="Engineering, Marketing, etc."
               />
-            </div> -->
+            </div>
 
             <div class="form-group">
               <label for="location">{{ $t('profile.location') }}</label>
@@ -92,7 +92,7 @@
                 max="50"
               />
             </div>
-          </div>
+          </div> -->
 
           <div class="form-group">
             <label for="description">{{ $t('profile.description') }}</label>
@@ -187,6 +187,41 @@
           <div v-if="passwordError" class="error-message">
             {{ passwordError }}
           </div>
+          
+          <!-- TOTP Section -->
+          <div class="totp-section">
+            <div class="totp-info">
+              <h4>{{ $t('profile.twoFactorAuth') }}</h4>
+              <p class="totp-description">{{ $t('profile.totpDescription') }}</p>
+              <div class="totp-status">
+                <span class="status-indicator" :class="{ 'enabled': totpEnabled }">
+                  {{ totpEnabled ? $t('profile.totpEnabled') : $t('profile.totpDisabled') }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="totp-actions">
+              <button 
+                v-if="!totpEnabled"
+                type="button" 
+                @click="showTotpSetup = true" 
+                class="btn-totp-enable"
+                :disabled="saving"
+              >
+                {{ $t('profile.enableTotp') }}
+              </button>
+              
+              <button 
+                v-else
+                type="button" 
+                @click="showTotpDisable = true" 
+                class="btn-totp-disable"
+                :disabled="saving"
+              >
+                {{ $t('profile.disableTotp') }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -206,12 +241,53 @@
       <p>{{ saveResult.message }}</p>
     </div>
   </div>
+  
+  <!-- TOTP Setup Modal -->
+  <TOTPSetup
+    v-if="showTotpSetup"
+    @cancel="showTotpSetup = false"
+    @complete="onTotpSetupComplete"
+  />
+
+  <!-- TOTP Disable Confirmation Modal -->
+  <div v-if="showTotpDisable" class="totp-disable-modal">
+    <div class="modal-overlay" @click="showTotpDisable = false"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ $t('profile.disableTotpConfirm') }}</h3>
+      </div>
+      <div class="modal-body">
+        <p>{{ $t('profile.disableTotpWarning') }}</p>
+        <div class="form-group">
+          <label for="disablePassword">{{ $t('profile.confirmPassword') }}</label>
+          <input
+            id="disablePassword"
+            v-model="disablePassword"
+            type="password"
+            class="form-input"
+            :placeholder="$t('profile.enterPassword')"
+            required
+          />
+        </div>
+        <div v-if="disableError" class="error-message">{{ disableError }}</div>
+      </div>
+      <div class="modal-actions">
+        <button @click="showTotpDisable = false" class="btn-secondary">
+          {{ $t('profile.cancel') }}
+        </button>
+        <button @click="disableTotp" :disabled="disablingTotp || !disablePassword" class="btn-danger">
+          {{ disablingTotp ? $t('profile.disabling') : $t('profile.disableTotp') }}
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apiService } from '../services/api.js'
+import TOTPSetup from './TOTPSetup.vue'
 
 const { t } = useI18n()
 
@@ -245,6 +321,14 @@ const passwordData = ref({
   confirmPassword: ''
 })
 const passwordError = ref('')
+
+// TOTP variables
+const totpEnabled = ref(false)
+const showTotpSetup = ref(false)
+const showTotpDisable = ref(false)
+const disablePassword = ref('')
+const disableError = ref('')
+const disablingTotp = ref(false)
 
 // Text representations for array fields
 const skillsText = ref('')
@@ -318,6 +402,9 @@ const loadProfile = async () => {
     learningGoalsText.value = profile.value.attributes.learningGoals.join(', ')
     expertiseText.value = profile.value.attributes.expertise.join(', ')
 
+    // Set TOTP status from API response
+    totpEnabled.value = userData.totpEnabled || false
+    
     // Store original for reset
     originalProfile.value = JSON.parse(JSON.stringify(profile.value))
   } catch (error) {
@@ -328,6 +415,44 @@ const loadProfile = async () => {
     }
   } finally {
     loading.value = false
+  }
+}
+
+const onTotpSetupComplete = () => {
+  showTotpSetup.value = false
+  totpEnabled.value = true
+  saveResult.value = {
+    type: 'success',
+    message: t('profile.totpEnabledSuccess')
+  }
+}
+
+const disableTotp = async () => {
+  disablingTotp.value = true
+  disableError.value = ''
+  
+  try {
+    const response = await apiService.disableTotp(disablePassword.value)
+    if (response.success) {
+      totpEnabled.value = false
+      showTotpDisable.value = false
+      disablePassword.value = ''
+      saveResult.value = {
+        type: 'success',
+        message: t('profile.totpDisabledSuccess')
+      }
+    } else {
+      const errorMap = {
+        'INVALID_PASSWORD': 'profile.errors.invalidPassword',
+        'TOTP_NOT_ENABLED': 'profile.errors.totpNotEnabled'
+      }
+      const errorKey = errorMap[response.errorCode]
+      disableError.value = errorKey ? t(errorKey) : (response.error || t('profile.errors.disableFailed'))
+    }
+  } catch (error) {
+    disableError.value = t('profile.errors.networkError')
+  } finally {
+    disablingTotp.value = false
   }
 }
 
@@ -768,5 +893,213 @@ const validatePassword = () => {
   .btn-secondary {
     width: 100%;
   }
+}
+
+.totp-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  margin-top: var(--spacing-lg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .totp-section {
+    background: var(--vt-c-black);
+    border: 1px solid var(--vt-c-divider-dark-1);
+  }
+}
+
+.totp-info h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+@media (prefers-color-scheme: dark) {
+  .totp-info h4 {
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
+.totp-description {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+@media (prefers-color-scheme: dark) {
+  .totp-description {
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
+.status-indicator {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  background: var(--color-gray-100);
+  color: var(--color-text-tertiary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-indicator {
+    background: var(--vt-c-black-mute);
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
+.status-indicator.enabled {
+  background: var(--color-success-light);
+  color: var(--color-success-dark);
+}
+
+.btn-totp-enable,
+.btn-totp-disable {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+  font-size: 0.9rem;
+}
+
+.btn-totp-enable {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn-totp-enable:hover:not(:disabled) {
+  background: var(--color-success-dark);
+  transform: translateY(-1px);
+}
+
+.btn-totp-disable {
+  background: var(--color-error);
+  color: white;
+}
+
+.btn-totp-disable:hover:not(:disabled) {
+  background: var(--color-error-dark);
+  transform: translateY(-1px);
+}
+
+.btn-totp-enable:disabled,
+.btn-totp-disable:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.totp-disable-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  position: relative;
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 400px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal-content {
+    background: var(--vt-c-black-mute);
+  }
+}
+
+.modal-header {
+  padding: var(--spacing-xl);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1.2rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal-header h3 {
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
+.modal-body {
+  padding: var(--spacing-xl);
+}
+
+.modal-body p {
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal-body p {
+    color: var(--vt-c-text-dark-2);
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: flex-end;
+  padding: var(--spacing-xl);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.btn-danger {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+  background: var(--color-error);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-error-dark);
+  transform: translateY(-1px);
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 </style>

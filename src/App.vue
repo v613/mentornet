@@ -242,7 +242,7 @@ header {
 
 .nav-tab:hover {
   color: var(--color-text-primary);
-  background-color: var(--vt-c-black-soft);
+  background-color: var(--color-bg-secondary);
 }
 
 @media (prefers-color-scheme: dark) {

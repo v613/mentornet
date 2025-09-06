@@ -88,6 +88,43 @@ export async function withAuth(event, handler) {
 }
 
 /**
+ * Authenticate user from event headers
+ * @param {Object} event Netlify event object
+ * @returns {Promise<Object>} Authentication result with success/error
+ */
+export async function authenticateUser(event) {
+  const authHeader = event.headers.authorization || event.headers.Authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return {
+      success: false,
+      error: 'Authentication required'
+    };
+  }
+  
+  const token = authHeader.replace('Bearer ', '');
+  const user = await verifyToken(token);
+  
+  if (!user) {
+    return {
+      success: false,
+      error: 'Invalid or expired token'
+    };
+  }
+  
+  return {
+    success: true,
+    user: {
+      id: user.userId,
+      email: user.email,
+      role: user.role,
+      displayName: user.displayName,
+      userid: user.email
+    }
+  };
+}
+
+/**
  * Check if user has required role
  * @param {Object} user User object from token
  * @param {Array<string>} allowedRoles Array of allowed roles

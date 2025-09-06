@@ -17,6 +17,10 @@
     "emailPlaceholder": "Enter your email",
     "password": "Password",
     "passwordPlaceholder": "Enter your password",
+    "loginWithPassword": "Login with Password",
+    "loginWithTotp": "Login with OTP",
+    "totpCode": "OTP Code",
+    "totpHelp": "Enter the 6-digit code from your authenticator app",
     "createMentorProfile": "Create profile as mentor",
     "accountBlocked": "Account Blocked",
     "accountBlockedMessage": "Your account has been blocked by an administrator. You cannot access courses or mentors at this time. Please contact support if you believe this is an error.",
@@ -32,7 +36,9 @@
       "userExists": "User already exists",
       "emailExists": "Email already exists",
       "userNotFound": "User not found",
-      "accessDenied": "Access denied"
+      "accessDenied": "Access denied",
+      "invalidTotpCode": "Invalid TOTP code",
+      "rateLimited": "Too many attempts. Please wait and try again."
     }
   },
   "courses": {
@@ -313,6 +319,8 @@
     "availableForMentoring": "Available for mentoring activities",
     "description": "Description",
     "descriptionPlaceholder": "Tell us about yourself, your experience, and goals...",
+    "cv": "CV/Resume",
+    "cvPlaceholder": "Link to your CV or resume",
     "profileImage": "Profile Image",
     "profileImagePlaceholder": "https://example.com/your-profile-image.jpg",
     "currentPassword": "Current Password",
@@ -320,6 +328,20 @@
     "confirmPassword": "Confirm New Password",
     "changePassword": "Change Password",
     "passwordSecurity": "Password & Security",
+    "security": "Security",
+    "twoFactorAuth": "Two-Factor Authentication",
+    "totpDescription": "Add an extra layer of security to your account with time-based one-time passwords",
+    "totpEnabled": "Enabled",
+    "totpDisabled": "Disabled",
+    "enableTotp": "Enable OTP",
+    "disableTotp": "Disable OTP",
+    "disableTotpConfirm": "Disable Two-Factor Authentication",
+    "disableTotpWarning": "This will remove OTP protection from your account. You will only need your password to sign in.",
+    "confirmPassword": "Confirm Password",
+    "enterPassword": "Enter your password",
+    "disabling": "Disabling...",
+    "totpEnabledSuccess": "Two-factor authentication has been successfully enabled",
+    "totpDisabledSuccess": "Two-factor authentication has been successfully disabled",
     "saveProfile": "Save Profile",
     "resetChanges": "Reset Changes",
     "saving": "Saving...",
@@ -341,6 +363,46 @@
       "passwordHelp": "Leave blank to keep current password",
       "passwordMismatch": "New passwords do not match",
       "passwordTooShort": "Password must be at least 6 characters long"
+    },
+    "errors": {
+      "invalidPassword": "Invalid password",
+      "totpNotEnabled": "OTP is not enabled for this account",
+      "disableFailed": "Failed to disable OTP",
+      "networkError": "Network error occurred"
+    }
+  },
+  "totp": {
+    "setup": {
+      "title": "Set up Two-Factor Authentication",
+      "step1Title": "Scan QR Code",
+      "step1Description": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
+      "manualEntry": "Can't scan? Enter this code manually:",
+      "copy": "Copy",
+      "next": "Next",
+      "cancel": "Cancel",
+      "step2Title": "Verify Your Setup",
+      "step2Description": "Enter the 6-digit code from your authenticator app to complete setup",
+      "verificationLabel": "Verification Code",
+      "verificationHelp": "Enter the code shown in your authenticator app",
+      "back": "Back",
+      "verify": "Verify & Enable",
+      "generatingQr": "Generating QR code...",
+      "qrCodeAlt": "QR Code",
+      "copied": "Copied!",
+      "retry": "Retry",
+      "verifying": "Verifying...",
+      "finish": "Finish",
+      "successTitle": "Success!",
+      "successDescription": "Two-factor authentication is now enabled",
+      "errors": {
+        "setupFailed": "Failed to set up TOTP",
+        "networkError": "Network error occurred",
+        "incompleteCode": "Please enter a complete 6-digit code",
+        "invalidCode": "Invalid code. Please try again.",
+        "rateLimited": "Too many attempts. Please wait and try again.",
+        "alreadyEnabled": "TOTP is already enabled for this account",
+        "verificationFailed": "Verification failed. Please try again."
+      }
     }
   },
   "dashboard": {
