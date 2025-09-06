@@ -155,7 +155,7 @@ class ApiService {
    * @returns {Promise<Object>} Authentication result with token and user data
    */
   async authenticateUser(userid, password) {
-    const response = await this.post('/auth-login', { userid, password });
+    const response = await this.post('/auth?action=login', { userid, password });
     
     // Only set token if authentication was successful
     if (response.success && response.token) {
@@ -173,7 +173,7 @@ class ApiService {
    * @returns {Promise<Object>} Registration result
    */
   async registerUser(userid, email, password, role = 'mentee') {
-    return this.post('/auth-register', { userid, email, password, role });
+    return this.post('/auth?action=register', { userid, email, password, role });
   }
 
   /**
@@ -183,7 +183,7 @@ class ApiService {
    * @returns {Promise<Object>} Authentication result with token and user data
    */
   async authenticateUserTotp(userid, code) {
-    const response = await this.post('/auth-totp', { userid, code });
+    const response = await this.post('/auth?action=totp', { userid, code });
     
     if (response.success && response.token) {
       this.setToken(response.token);
@@ -197,7 +197,7 @@ class ApiService {
    * @returns {Promise<Object>} Setup result with QR code and secret
    */
   async setupTotp() {
-    return this.post('/totp-setup', {});
+    return this.post('/totp?action=setup', {});
   }
 
   /**
@@ -206,7 +206,7 @@ class ApiService {
    * @returns {Promise<Object>} Verification result
    */
   async verifyTotpSetup(code) {
-    return this.post('/totp-verify-setup', { code });
+    return this.post('/totp?action=verify', { code });
   }
 
   /**
@@ -215,7 +215,7 @@ class ApiService {
    * @returns {Promise<Object>} Disable result
    */
   async disableTotp(password) {
-    return this.post('/totp-disable', { password });
+    return this.post('/totp?action=disable', { password });
   }
 
   /**
@@ -234,7 +234,7 @@ class ApiService {
    * @returns {Promise<Object>} User profile data
    */
   async getUserWithRoles() {
-    const response = await this.get('/users-profile');
+    const response = await this.get('/users');
     return response.user;
   }
 
@@ -244,7 +244,7 @@ class ApiService {
    * @returns {Promise<Object>} Update result
    */
   async updateUserProfile(profileData) {
-    return this.put('/users-profile', profileData);
+    return this.put('/users', profileData);
   }
 
   /**
@@ -254,7 +254,7 @@ class ApiService {
    * @returns {Promise<Object>} Password change result
    */
   async changePassword(currentPassword, newPassword) {
-    return this.put('/users-change-password', { currentPassword, newPassword });
+    return this.post('/users?action=change-password', { currentPassword, newPassword });
   }
 
   /**
@@ -262,7 +262,7 @@ class ApiService {
    * @returns {Promise<Array>} List of enrolled courses
    */
   async getMenteeEnrolledCourses() {
-    const response = await this.get('/users-enrolled-courses');
+    const response = await this.get('/user-courses?type=enrolled');
     return response.courses || [];
   }
 
@@ -271,7 +271,7 @@ class ApiService {
    * @returns {Promise<Array>} List of mentor's courses
    */
   async getMentorCourses() {
-    const response = await this.get('/users-my-courses');
+    const response = await this.get('/user-courses?type=created');
     return response.courses || [];
   }
 
@@ -288,11 +288,15 @@ class ApiService {
    * @returns {Promise<Object>} Users with pagination and filter info
    */
   async getAllUsers(page = 1, pageSize = 20, role = null, search = null) {
-    const params = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() });
+    const params = new URLSearchParams({ 
+      action: 'list',
+      page: page.toString(), 
+      pageSize: pageSize.toString() 
+    });
     if (role) params.append('role', role);
     if (search && search.trim()) params.append('search', search.trim());
     
-    const response = await this.get(`/users-list?${params.toString()}`);
+    const response = await this.get(`/users?${params.toString()}`);
     return {
       users: response.users || [],
       pagination: response.pagination || {},
@@ -307,7 +311,10 @@ class ApiService {
    * @returns {Promise<Object>} Update result
    */
   async updateUserBlockStatus(userId, blocked) {
-    return this.put('/users-block', { userId, blocked });
+    return this.request(`/users?action=block&userId=${userId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ blocked }),
+    });
   }
 
   /**
@@ -325,7 +332,7 @@ class ApiService {
    * @returns {Promise<Array>} List of all courses
    */
   async getAllCoursesForAdmin() {
-    const response = await this.get('/courses-list?all=true');
+    const response = await this.get('/courses?all=true');
     return response.courses || [];
   }
 
@@ -336,7 +343,7 @@ class ApiService {
    * @returns {Promise<Object>} Update result
    */
   async updateAnyCourse(courseId, courseData) {
-    return this.put(`/courses-update?courseId=${courseId}`, courseData);
+    return this.put(`/courses?courseId=${courseId}`, courseData);
   }
 
   /**
@@ -345,7 +352,7 @@ class ApiService {
    * @returns {Promise<Object>} Delete result
    */
   async deleteAnyCourse(courseId) {
-    return this.delete(`/courses-delete?courseId=${courseId}`);
+    return this.delete(`/courses?courseId=${courseId}`);
   }
 
   // ============================================
@@ -359,7 +366,7 @@ class ApiService {
    * @returns {Promise<Object>} Courses with pagination info
    */
   async getCourses(page = 1, pageSize = 10) {
-    const response = await this.get(`/courses-list?page=${page}&pageSize=${pageSize}`);
+    const response = await this.get(`/courses?page=${page}&pageSize=${pageSize}`);
     return {
       courses: response.courses || [],
       pagination: response.pagination || {}
@@ -372,7 +379,7 @@ class ApiService {
    * @returns {Promise<Object>} Course creation result
    */
   async createCourse(courseData) {
-    return this.post('/courses-create', courseData);
+    return this.post('/courses', courseData);
   }
 
   /**
@@ -382,7 +389,7 @@ class ApiService {
    * @returns {Promise<Object>} Course update result
    */
   async updateCourse(courseId, courseData) {
-    return this.put(`/courses-update?courseId=${courseId}`, courseData);
+    return this.put(`/courses?courseId=${courseId}`, courseData);
   }
 
   /**
@@ -439,7 +446,7 @@ class ApiService {
    * @returns {Promise<Array>} List of mentors
    */
   async getMentors() {
-    const response = await this.get('/mentors-list');
+    const response = await this.get('/mentors');
     return response.mentors || [];
   }
 
@@ -449,7 +456,7 @@ class ApiService {
    * @returns {Promise<Object>} Mentor profile with statistics
    */
   async getMentorProfile(mentorId) {
-    const response = await this.get(`/mentors-profile?mentorId=${mentorId}`);
+    const response = await this.get(`/mentors?mentorId=${mentorId}`);
     return response.mentor;
   }
 
