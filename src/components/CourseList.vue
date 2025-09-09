@@ -165,6 +165,14 @@
         </div>
       </div>
     </div>
+    
+    <!-- Time Slot Selection Modal -->
+    <TimeSlotSelectionModal 
+      :show-modal="showTimeSlotSelection"
+      :time-slots="selectedCourseTimeSlots"
+      @apply="handleTimeSlotApplication"
+      @cancel="cancelTimeSlotSelection"
+    />
   </div>
 </template>
 
@@ -172,6 +180,7 @@
 import { defineEmits, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apiService } from '../services/api.js'
+import TimeSlotSelectionModal from './TimeSlotSelectionModal.vue'
 
 const { t } = useI18n()
 
@@ -195,6 +204,9 @@ const props = defineProps({
 })
 
 const currentUser = ref(null)
+const showTimeSlotSelection = ref(false)
+const selectedCourseForApplication = ref(null)
+const selectedCourseTimeSlots = ref([])
 
 onMounted(async () => {
   try {
@@ -312,6 +324,16 @@ const viewApplications = (course) => {
 }
 
 const applyToCourse = (course) => {
+  // Check if course has time slots for selection
+  const timeSlots = course.timeSlots
+  if (timeSlots && timeSlots.length > 0) {
+    selectedCourseForApplication.value = course
+    selectedCourseTimeSlots.value = timeSlots
+    showTimeSlotSelection.value = true
+    return
+  }
+  
+  // If no time slots, proceed with direct application
   emit('apply-to-course', course.courseId)
 }
 
@@ -338,6 +360,46 @@ const cancelCourseApplication = async (course) => {
     console.error('Error cancelling course application:', error)
     alert(t('courses.cancelError', { error: error.message }))
   }
+}
+
+const handleTimeSlotApplication = async (timeSlot) => {
+  if (!selectedCourseForApplication.value) {
+    return
+  }
+  
+  // Get application data
+  const motivation = prompt(t('courses.details.whyInterested')) || t('courses.details.interestedInLearning')
+  const experience = prompt(t('courses.details.experienceLevel')) || t('courses.details.beginner')
+  
+  if (motivation) {
+    try {
+      const result = await apiService.applyToCourse(
+        selectedCourseForApplication.value.courseId,
+        motivation,
+        experience,
+        timeSlot.id || timeSlot
+      )
+      
+      if (result.success) {
+        alert(t('courses.details.applicationSuccess'))
+        emit('apply-to-course', selectedCourseForApplication.value.courseId)
+      } else {
+        alert(t(result.error))
+      }
+    } catch (error) {
+      console.error('Error applying to course:', error)
+      alert(t('courses.details.applicationError') + ': ' + error.message)
+    }
+  }
+  
+  // Close modal
+  cancelTimeSlotSelection()
+}
+
+const cancelTimeSlotSelection = () => {
+  showTimeSlotSelection.value = false
+  selectedCourseForApplication.value = null
+  selectedCourseTimeSlots.value = []
 }
 </script>
 

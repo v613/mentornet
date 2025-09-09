@@ -170,7 +170,25 @@
           </template>
           
           <template v-else-if="course.status === 'published'">
+            <!-- Show cancel registration if user is already enrolled -->
             <button 
+              v-if="isUserEnrolled"
+              @click="cancelRegistration" 
+              class="action-btn warning"
+            >
+              {{ t('courses.details.cancelRegistration') }}
+            </button>
+            
+            <!-- Show enrollment status if pending -->
+            <div v-else-if="userEnrollmentStatus === 'pending'" class="enrollment-status">
+              <span class="status pending">
+                {{ t('courses.details.applicationPending') }}
+              </span>
+            </div>
+            
+            <!-- Show apply button if not enrolled -->
+            <button 
+              v-else
               @click="applyCourse" 
               :disabled="course.enrolledCount >= course.maxEnrollment"
               class="action-btn primary"
@@ -197,40 +215,12 @@
     </div>
     
     <!-- Time Slot Selection Modal -->
-    <div v-if="showTimeSlotSelection" class="time-slot-overlay" @click="cancelTimeSlotSelection">
-      <div class="time-slot-modal" @click.stop>
-        <div class="modal-header">
-          <h3>{{ t('courses.details.selectTimeSlot') }}</h3>
-          <button @click="cancelTimeSlotSelection" class="close-btn">&times;</button>
-        </div>
-        <div class="time-slot-content">
-          <p>{{ t('courses.details.choosePreferredTime') }}</p>
-          <div class="time-slots-list">
-            <label 
-              v-for="(slot, index) in course.timeSlots" 
-              :key="index"
-              class="time-slot-option"
-            >
-              <input 
-                type="radio" 
-                :value="slot" 
-                v-model="selectedTimeSlot"
-                name="timeSlot"
-              />
-              <span class="time-slot-label">{{ formatTimeSlot(slot) }}</span>
-            </label>
-          </div>
-          <div class="time-slot-actions">
-            <button @click="cancelTimeSlotSelection" class="btn-secondary">
-              {{ t('common.cancel') }}
-            </button>
-            <button @click="submitTimeSlotApplication" class="btn-primary">
-              {{ t('courses.details.applyWithTimeSlot') }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <TimeSlotSelectionModal 
+      :show-modal="showTimeSlotSelection"
+      :time-slots="course.timeSlots"
+      @apply="handleTimeSlotApplication"
+      @cancel="cancelTimeSlotSelection"
+    />
   </div>
 </template>
 
@@ -238,6 +228,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apiService } from '../services/api.js'
+import TimeSlotSelectionModal from './TimeSlotSelectionModal.vue'
 
 const { t } = useI18n()
 
@@ -269,8 +260,11 @@ const canManageCourse = computed(() => {
   return isOwner.value || isAdmin.value
 })
 const saveResult = ref(null)
-const selectedTimeSlot = ref(null)
 const showTimeSlotSelection = ref(false)
+const userEnrollmentStatus = ref(null)
+const isUserEnrolled = computed(() => {
+  return userEnrollmentStatus.value && ['pending', 'approved'].includes(userEnrollmentStatus.value)
+})
 
 onMounted(async () => {
   // Get current user information
@@ -288,6 +282,9 @@ onMounted(async () => {
   if (showApplications.value || (props.userRole === 'mentor' && canManageCourse.value)) {
     await loadApplications()
   }
+  
+  // Check user enrollment status
+  await checkUserEnrollmentStatus()
 })
 
 const closeModal = () => {
@@ -318,6 +315,27 @@ const loadApplications = async () => {
     applications.value = result.applications || []
   } catch (error) {
     console.error('Error loading applications:', error)
+  }
+}
+
+const checkUserEnrollmentStatus = async () => {
+  if (!currentUser.value) {
+    return
+  }
+  
+  try {
+    // Get user's enrolled courses to check if already enrolled
+    const enrolledCourses = await apiService.getMenteeEnrolledCourses()
+    const enrolledCourse = enrolledCourses.find(course => course.courseId === props.course.courseId)
+    
+    if (enrolledCourse) {
+      userEnrollmentStatus.value = enrolledCourse.enrollmentStatus
+    } else {
+      userEnrollmentStatus.value = null
+    }
+  } catch (error) {
+    console.error('Error checking enrollment status:', error)
+    userEnrollmentStatus.value = null
   }
 }
 
@@ -454,19 +472,11 @@ const moderateCourse = () => {
   }
 }
 
-const submitTimeSlotApplication = async () => {
-  if (!selectedTimeSlot.value) {
-    saveResult.value = {
-      type: 'error',
-      message: t('courses.details.pleaseSelectTimeSlot')
-    }
-    return
-  }
-  
+const handleTimeSlotApplication = async (timeSlot) => {
   const applicationData = {
     motivation: prompt(t('courses.details.whyInterested')) || t('courses.details.interestedInLearning'),
     experience: prompt(t('courses.details.experienceLevel')) || t('courses.details.beginner'),
-    timeSlotId: selectedTimeSlot.value.id || selectedTimeSlot.value
+    timeSlotId: timeSlot.id || timeSlot
   }
   
   if (applicationData.motivation) {
@@ -484,7 +494,6 @@ const submitTimeSlotApplication = async () => {
         }
         
         showTimeSlotSelection.value = false
-        selectedTimeSlot.value = null
         
         // Clear success message after 3 seconds
         setTimeout(() => {
@@ -509,13 +518,46 @@ const submitTimeSlotApplication = async () => {
 
 const cancelTimeSlotSelection = () => {
   showTimeSlotSelection.value = false
-  selectedTimeSlot.value = null
 }
 
-const formatTimeSlot = (slot) => {
-  const day = t(`days.${slot.dayOfWeek}`)
-  return `${day} ${slot.startTime} - ${slot.endTime} (${slot.maxParticipants} ${t('courses.maxParticipants')})`
+const cancelRegistration = async () => {
+  if (!confirm(t('courses.details.confirmCancelRegistration'))) {
+    return
+  }
+  
+  try {
+    const result = await apiService.cancelCourseApplication(props.course.courseId)
+    if (result.success) {
+      // Update enrollment status
+      userEnrollmentStatus.value = null
+      
+      saveResult.value = {
+        type: 'success',
+        message: t('courses.details.registrationCancelled')
+      }
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        saveResult.value = null
+      }, 3000)
+      
+      // Emit event to refresh course data in parent component
+      emit('refresh-course-data')
+    } else {
+      saveResult.value = {
+        type: 'error',
+        message: t('courses.details.cancelRegistrationError') + ': ' + result.error
+      }
+    }
+  } catch (error) {
+    console.error('Error cancelling registration:', error)
+    saveResult.value = {
+      type: 'error',
+      message: t('courses.details.cancelRegistrationError') + ': ' + error.message
+    }
+  }
 }
+
 </script>
 
 <style scoped>
@@ -1021,98 +1063,22 @@ const formatTimeSlot = (slot) => {
   border: 1px solid #f5c6cb;
 }
 
-/* Time Slot Selection Modal */
-.time-slot-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+.enrollment-status {
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  z-index: 1002;
-}
-
-.time-slot-modal {
-  background: white;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.time-slot-content {
-  padding: 1.5rem;
-}
-
-.time-slots-list {
-  margin: 1rem 0;
-}
-
-.time-slot-option {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  border: 1px solid #e0e0e0;
+  padding: 0.75rem 1.5rem;
   border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.time-slot-option:hover {
-  background-color: #f8f9fa;
-}
-
-.time-slot-option input[type="radio"] {
-  margin: 0;
-}
-
-.time-slot-label {
   font-weight: 500;
-  color: #333;
 }
 
-.time-slot-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
-}
-
-.btn-primary {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
+.enrollment-status .status.pending {
+  background-color: #fff3e0;
+  color: #f57c00;
+  padding: 0.5rem 1rem;
   border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.btn-primary:hover {
-  background-color: #45a049;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
+  font-size: 0.9rem;
+  text-transform: uppercase;
 }
 
 @media (max-width: 768px) {

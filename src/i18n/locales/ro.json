@@ -257,7 +257,12 @@
       "selectTimeSlot": "Selectați Intervalul Orar",
       "choosePreferredTime": "Vă rugăm să alegeți intervalul orar preferat pentru acest curs:",
       "applyWithTimeSlot": "Aplicați cu Intervalul Selectat",
-      "pleaseSelectTimeSlot": "Vă rugăm să selectați un interval orar înainte de a aplica"
+      "pleaseSelectTimeSlot": "Vă rugăm să selectați un interval orar înainte de a aplica",
+      "cancelRegistration": "Anulează Înregistrarea",
+      "applicationPending": "Aplicația în Așteptare",
+      "confirmCancelRegistration": "Sigur doriți să anulați înregistrarea la acest curs? Această acțiune nu poate fi anulată.",
+      "registrationCancelled": "Înregistrarea la curs a fost anulată cu succes!",
+      "cancelRegistrationError": "Eroare la anularea înregistrării"
     },
     "empty": {
       "myCourses": "Nu ați creat încă niciun curs. Faceți clic pe \"Creează Curs\" pentru a începe!",
@@ -265,7 +270,8 @@
       "allCourses": "Nu s-au găsit cursuri în sistem.",
       "default": "Nu s-au găsit cursuri."
     },
-    "total": "cursuri"
+    "total": "cursuri",
+    "maxParticipants": "participanți"
   },
   "mentors": {
     "title": "Mentori",
