@@ -262,7 +262,9 @@
       "applicationPending": "Заявка в ожидании",
       "confirmCancelRegistration": "Вы уверены, что хотите отменить регистрацию на этот курс? Это действие нельзя отменить.",
       "registrationCancelled": "Регистрация на курс успешно отменена!",
-      "cancelRegistrationError": "Ошибка при отмене регистрации"
+      "cancelRegistrationError": "Ошибка при отмене регистрации",
+      "scheduledFor": "Запланировано на",
+      "timeSlotNotFound": "Временной слот не найден"
     },
     "empty": {
       "myCourses": "Вы еще не создали ни одного курса. Нажмите \"Создать курс\", чтобы начать!",

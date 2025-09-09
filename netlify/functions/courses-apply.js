@@ -104,10 +104,10 @@ export async function handler(event) {
       
       // Create application
       const applicationResult = await executeQuery(`
-        INSERT INTO subscriptions (course_id, mentee_id, status, motivation, experience, subscribed_at)
-        VALUES ($1, $2, 'pending', $3, $4, NOW())
+        INSERT INTO subscriptions (course_id, mentee_id, status, motivation, experience, time_slot_id, subscribed_at)
+        VALUES ($1, $2, 'pending', $3, $4, $5, NOW())
         RETURNING subscription_id as "subscriptionId", status, subscribed_at as "appliedAt"
-      `, [parseInt(courseId), user.userId, motivation, experience]);
+      `, [parseInt(courseId), user.userId, motivation, experience, timeSlotId !== undefined ? parseInt(timeSlotId) : null]);
       
       if (!applicationResult.success) {
         return serverError('Failed to submit application');

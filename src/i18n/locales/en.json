@@ -262,7 +262,9 @@
       "applicationPending": "Application Pending",
       "confirmCancelRegistration": "Are you sure you want to cancel your registration for this course? This cannot be undone.",
       "registrationCancelled": "Course registration cancelled successfully!",
-      "cancelRegistrationError": "Error cancelling registration"
+      "cancelRegistrationError": "Error cancelling registration",
+      "scheduledFor": "Scheduled for",
+      "timeSlotNotFound": "Time slot not found"
     },
     "empty": {
       "myCourses": "You haven't created any courses yet. Click \"Create Course\" to get started!",

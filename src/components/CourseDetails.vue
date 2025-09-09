@@ -107,6 +107,9 @@
               <div class="applicant-info">
                 <h5>{{ application.applicantName }}</h5>
                 <p class="application-date">{{ t('courses.details.applied') }}: {{ formatDate(application.appliedAt) }}</p>
+                <p v-if="application.timeSlotId !== null && application.timeSlotId !== undefined" class="scheduled-time">
+                  {{ t('courses.details.scheduledFor') }}: {{ formatScheduledTime(application.timeSlotId) }}
+                </p>
               </div>
               <div class="application-content">
                 <p><strong>{{ t('courses.details.motivation') }}:</strong> {{ application.motivation || t('courses.details.notProvided') }}</p>
@@ -558,6 +561,16 @@ const cancelRegistration = async () => {
   }
 }
 
+const formatScheduledTime = (timeSlotId) => {
+  if (timeSlotId === null || timeSlotId === undefined || !props.course.timeSlots) return ''
+  
+  const slot = props.course.timeSlots[timeSlotId]
+  if (!slot) return t('courses.details.timeSlotNotFound')
+  
+  const day = t(`days.${slot.dayOfWeek}`)
+  return `${day} ${slot.startTime} - ${slot.endTime}`
+}
+
 </script>
 
 <style scoped>
@@ -903,11 +916,22 @@ const cancelRegistration = async () => {
   font-size: 0.9rem;
 }
 
+.scheduled-time {
+  margin: 0.25rem 0 0 0;
+  color: #4CAF50;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 @media (prefers-color-scheme: dark) {
   .application-date {
     margin: 0;
     color: var(--vt-c-text-dark-2);
     font-size: 0.9rem;
+  }
+  
+  .scheduled-time {
+    color: #4CAF50;
   }
 }
 

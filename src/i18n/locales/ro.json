@@ -262,7 +262,9 @@
       "applicationPending": "Aplicația în Așteptare",
       "confirmCancelRegistration": "Sigur doriți să anulați înregistrarea la acest curs? Această acțiune nu poate fi anulată.",
       "registrationCancelled": "Înregistrarea la curs a fost anulată cu succes!",
-      "cancelRegistrationError": "Eroare la anularea înregistrării"
+      "cancelRegistrationError": "Eroare la anularea înregistrării",
+      "scheduledFor": "Programat pentru",
+      "timeSlotNotFound": "Intervalul orar nu a fost găsit"
     },
     "empty": {
       "myCourses": "Nu ați creat încă niciun curs. Faceți clic pe \"Creează Curs\" pentru a începe!",

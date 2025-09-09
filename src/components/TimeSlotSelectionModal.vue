@@ -12,14 +12,16 @@
             v-for="(slot, index) in timeSlots" 
             :key="index"
             class="time-slot-option"
+            :class="{ 'disabled': isSlotFull(slot) }"
           >
             <input 
               type="radio" 
-              :value="slot" 
+              :value="index" 
               v-model="selectedTimeSlot"
+              :disabled="isSlotFull(slot)"
               name="timeSlot"
             />
-            <span class="time-slot-label">{{ formatTimeSlot(slot) }}</span>
+            <span class="time-slot-label">{{ formatTimeSlotWithCount(slot) }}</span>
           </label>
         </div>
         <div class="time-slot-actions">
@@ -62,13 +64,20 @@ watch(() => props.showModal, (newValue) => {
   }
 })
 
-const formatTimeSlot = (slot) => {
+const formatTimeSlotWithCount = (slot) => {
   const day = t(`days.${slot.dayOfWeek}`)
-  return `${day} ${slot.startTime} - ${slot.endTime} (${slot.maxParticipants} ${t('courses.maxParticipants')})`
+  const current = slot.currentEnrollment || 0
+  const max = slot.maxParticipants
+  return `${day} ${slot.startTime} - ${slot.endTime} (${current}/${max} ${t('courses.maxParticipants')})`
+}
+
+const isSlotFull = (slot) => {
+  const currentCount = slot.currentEnrollment || 0
+  return currentCount >= slot.maxParticipants
 }
 
 const handleApply = () => {
-  if (!selectedTimeSlot.value) {
+  if (selectedTimeSlot.value === null || selectedTimeSlot.value === undefined) {
     return
   }
   emit('apply', selectedTimeSlot.value)
@@ -257,5 +266,31 @@ const handleCancel = () => {
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+.time-slot-option.disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.time-slot-option.disabled input[type="radio"] {
+  cursor: not-allowed;
+}
+
+.time-slot-option.disabled .time-slot-label {
+  color: #999;
+}
+
+@media (prefers-color-scheme: dark) {
+  .time-slot-option.disabled {
+    background-color: var(--vt-c-black-mute);
+    color: #666;
+  }
+  
+  .time-slot-option.disabled .time-slot-label {
+    color: #666;
+  }
 }
 </style>

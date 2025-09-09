@@ -72,7 +72,8 @@ async function handleGetApplications(event, user) {
         s.subscribed_at as "appliedAt",
         s.status,
         s.motivation,
-        s.experience
+        s.experience,
+        s.time_slot_id as "timeSlotId"
       FROM subscriptions s
       LEFT JOIN users u ON s.mentee_id = u.id
       WHERE s.course_id = $1

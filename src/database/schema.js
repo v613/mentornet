@@ -58,6 +58,7 @@ export const subscriptions = pgTable('subscriptions', {
   status: varchar('status', { length: 20 }).default('pending'),
   motivation: text('motivation'),
   experience: text('experience'),
+  timeSlotId: integer('time_slot_id'),
   subscribedAt: timestamp('subscribed_at', { withTimezone: true }).defaultNow(),
 });
 

@@ -119,14 +119,44 @@ async function handleGetCourses(event) {
     return serverError('Failed to load courses');
   }
   
-  // Process JSON fields and format data
-  const processedCourses = coursesResult.data.map(course => ({
-    ...course,
-    skills: course.skills ? JSON.parse(course.skills) : [],
-    prerequisites: course.prerequisites ? JSON.parse(course.prerequisites) : [],
-    settings: course.settings ? JSON.parse(course.settings) : {},
-    timeSlots: course.timeSlots ? JSON.parse(course.timeSlots) : []
-  }));
+  // Get enrollment counts per time slot for all courses
+  const timeSlotEnrollments = new Map();
+  if (coursesResult.data.length > 0) {
+    const courseIds = coursesResult.data.map(c => c.courseId);
+    const enrollmentResult = await executeQuery(`
+      SELECT 
+        course_id as "courseId",
+        time_slot_id as "timeSlotId", 
+        COUNT(*) as enrollment_count
+      FROM subscriptions 
+      WHERE course_id = ANY($1) AND status = 'approved' AND time_slot_id IS NOT NULL
+      GROUP BY course_id, time_slot_id
+    `, [courseIds]);
+    
+    if (enrollmentResult.success) {
+      enrollmentResult.data.forEach(row => {
+        const key = `${row.courseId}_${row.timeSlotId}`;
+        timeSlotEnrollments.set(key, parseInt(row.enrollment_count));
+      });
+    }
+  }
+  
+  // Process JSON fields and format data with time slot enrollments
+  const processedCourses = coursesResult.data.map(course => {
+    const timeSlots = course.timeSlots ? JSON.parse(course.timeSlots) : [];
+    const enrichedTimeSlots = timeSlots.map((slot, index) => ({
+      ...slot,
+      currentEnrollment: timeSlotEnrollments.get(`${course.courseId}_${index}`) || 0
+    }));
+    
+    return {
+      ...course,
+      skills: course.skills ? JSON.parse(course.skills) : [],
+      prerequisites: course.prerequisites ? JSON.parse(course.prerequisites) : [],
+      settings: course.settings ? JSON.parse(course.settings) : {},
+      timeSlots: enrichedTimeSlots
+    };
+  });
   
   // Calculate pagination metadata
   const totalPages = Math.ceil(total / pageSize);
