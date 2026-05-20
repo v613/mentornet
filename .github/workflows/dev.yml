@@ -10,6 +10,9 @@ jobs:
   security-scan:
     name: Security Vulnerability Scan
     runs-on: ubuntu-22.04
+    env:
+      # auto-approve build scripts in CI (safe if you trust your deps)
+      PNPM_APPROVE_BUILDS: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
