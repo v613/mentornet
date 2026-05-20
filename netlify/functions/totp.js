@@ -2,7 +2,8 @@ import { executeQuery } from './shared/database.js';
 import { authenticateUser } from './shared/auth.js';
 import { validateRequiredFields } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError } from './shared/response.js';
-import { authenticator } from 'otplib';
+//import { authenticator } from 'otplib';
+import { generateSecret, verifySync, generateURI } from 'otplib';
 import QRCode from 'qrcode';
 
 // Rate limiting: Store recent attempts in memory
@@ -85,10 +86,10 @@ async function handleTotpSetup(userId, user) {
   }
   
   // Generate new TOTP secret
-  const secret = authenticator.generateSecret();
+  const secret = generateSecret();
   
   // Create TOTP URL for QR code
-  const totpUrl = authenticator.keyuri(user.userid, 'MentorNet', secret);
+  const totpUrl = generateURI({label:user.userid, issuer: "MentorNet", secret: secret});
   
   // Generate QR code data URL
   const qrCodeDataUrl = await QRCode.toDataURL(totpUrl);
@@ -164,11 +165,11 @@ async function handleTotpVerify(event, userId) {
   attemptTracker.set(userId, recentAttempts);
   
   // Verify TOTP code
-  const isValid = authenticator.verify({
+  const isValid = verifySync({
     token: code,
     secret: totpRecord.secret,
-    window: 1 // Allow 1 time step tolerance (30 seconds before/after)
-  });
+    period: 30,
+  }).valid;
   
   if (!isValid) {
     return errorResponse('Invalid verification code', 400, 'INVALID_CODE');

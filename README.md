@@ -147,7 +147,7 @@ graph TB
 
 ### Prerequisites
 
-- Node.js 20.19+ or 22.12+
+- Node.js 22.12+ or 26.1+
 - `npm` or `pnpm` package manager
 - Neon PostgreSQL database
 - Environment variables configured (see below)

@@ -2,7 +2,7 @@ import { executeQuery } from './shared/database.js';
 import { generateToken } from './shared/auth.js';
 import { validateRequiredFields, isValidEmail, validatePassword } from './shared/validation.js';
 import { successResponse, errorResponse, corsResponse, validationError, serverError } from './shared/response.js';
-import { authenticator } from 'otplib';
+import { verifySync } from 'otplib';
 
 // Rate limiting: Store recent attempts in memory
 const attemptTracker = new Map();
@@ -225,11 +225,11 @@ async function handleTotpAuth(event) {
   recentAttempts.push(now);
   attemptTracker.set(userid, recentAttempts);
   
-  const isValid = authenticator.verify({
+  const isValid = verifySync({
     token: code,
     secret: user.secret,
-    window: 1 // Allow 1 time step tolerance (30 seconds before/after)
-  });
+    period: 30
+  }).valid;
   
   if (!isValid) {
     return errorResponse('Invalid TOTP code', 401, 'INVALID_CODE');
