@@ -26,9 +26,11 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
+        # auto-approve build scripts in CI to avoid interactive prompt
+        PNPM\_APPROVE\_BUILDS: "true"
         run: pnpm install --no-frozen-lockfile
 
       - name: Run pnpm audit
-        run: pnpm audit --audit-level=moderate
+        run: pnpm audit --audit-level=high
 
 
