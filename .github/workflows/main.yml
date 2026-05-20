@@ -6,13 +6,13 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  PNPM_APPROVE_BUILDS: "true"
+
 jobs:
   security-scan:
     name: Security Vulnerability Scan
     runs-on: ubuntu-22.04
-    env:
-      # auto-approve build scripts in CI (safe if you trust your deps)
-      PNPM_APPROVE_BUILDS: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,8 +29,6 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        # auto-approve build scripts in CI to avoid interactive prompt
-        PNPM\_APPROVE\_BUILDS: "true"
         run: pnpm install --no-frozen-lockfile
 
       - name: Run pnpm audit
